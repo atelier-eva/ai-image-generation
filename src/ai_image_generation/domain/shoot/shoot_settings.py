@@ -13,18 +13,16 @@ from ai_image_generation.domain.character.feature.character_feature import (
 from ai_image_generation.domain.quality.quality import Quality
 from ai_image_generation.domain.rating.content_rating import ContentRating
 from ai_image_generation.domain.scene.scene import Scene
-from ai_image_generation.domain.shoot.shot_exclusion_settings import (
-    ShotExclusionSettings,
-)
-from ai_image_generation.domain.shoot.shot_filter_settings import ShotFilterSettings
+from ai_image_generation.domain.shoot.shot_exclusion import ShotExclusion
+from ai_image_generation.domain.shoot.shot_filter import ShotFilter
 
 
 @dataclass
 class ShootSettings:
     cameras: tuple[Camera, ...] = ()
     characters: tuple[Character, ...] = ()
-    exclusions: tuple[ShotExclusionSettings, ...] = ()
-    filters: tuple[ShotFilterSettings, ...] = ()
+    exclusions: tuple[ShotExclusion, ...] = ()
+    filters: tuple[ShotFilter, ...] = ()
     scene: Scene | None = None
     art_style: ArtStyle | None = None
     quality: Quality | None = None
