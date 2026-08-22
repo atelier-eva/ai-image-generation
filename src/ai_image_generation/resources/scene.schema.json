@@ -1,14 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://local.spec/lora/lora-art-style.schema.json",
-  "title": "LoRA art style (lora-art-style.json)",
-  "description": "Art style, quality, and rating tags for generated prompts.",
+  "$id": "https://local.spec/scene.schema.json",
+  "title": "Scene (scene.json)",
+  "description": "Background and lighting tags for generated prompts.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "art_style": { "$ref": "#/$defs/tagSet" },
-    "quality": { "$ref": "#/$defs/tagSet" },
-    "rating": { "$ref": "#/$defs/tagSet" }
+    "background": { "$ref": "#/$defs/tagSet" },
+    "lighting": { "$ref": "#/$defs/tagSet" }
   },
   "$defs": {
     "tagSet": {
