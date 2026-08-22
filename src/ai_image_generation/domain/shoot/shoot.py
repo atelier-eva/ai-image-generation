@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from ai_image_generation.domain.art_style.art_style import ArtStyle
 from ai_image_generation.domain.camera.camera import Camera
 from ai_image_generation.domain.expression.expression_settings import ExpressionSettings
+from ai_image_generation.domain.pose.pose_settings import PoseSettings
 from ai_image_generation.domain.quality.quality import Quality
 from ai_image_generation.domain.rating.content_rating import ContentRating
 from ai_image_generation.domain.scene.scene import Scene
@@ -14,6 +15,7 @@ class Shoot:
     cameras: tuple[Camera, ...] = ()
     subjects: tuple[Subject, ...] = ()
     expressions: ExpressionSettings = field(default_factory=ExpressionSettings)
+    poses: PoseSettings = field(default_factory=PoseSettings)
     scene: Scene | None = None
     art_style: ArtStyle | None = None
     quality: Quality | None = None
