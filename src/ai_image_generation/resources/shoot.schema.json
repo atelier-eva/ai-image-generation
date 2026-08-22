@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://local.spec/shoot.schema.json",
   "title": "Shoot (shoot.json)",
-  "description": "Prompt tag definitions for camera, expression, and character combinations.",
+  "description": "Prompt tag definitions for camera, expression, pose, and character combinations.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -50,6 +50,20 @@
         "skip_camera": {
           "$ref": "#/$defs/skip_camera",
           "description": "When angle or distance name matches (OR), emit one row per character without expression tags instead of iterating expression.patterns."
+        },
+        "patterns": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/namedTagSet" }
+        }
+      }
+    },
+    "pose": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "skip_camera": {
+          "$ref": "#/$defs/skip_camera",
+          "description": "When angle or distance name matches (OR), emit one row per character without pose tags instead of iterating pose.patterns."
         },
         "patterns": {
           "type": "array",

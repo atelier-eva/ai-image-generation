@@ -10,5 +10,12 @@
     },
     "patterns": []
   },
+  "pose": {
+    "skip_camera": {
+      "angle": [],
+      "distance": []
+    },
+    "patterns": []
+  },
   "characters": []
 }

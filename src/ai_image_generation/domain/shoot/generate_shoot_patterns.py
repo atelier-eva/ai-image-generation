@@ -2,6 +2,7 @@ import re
 
 from ai_image_generation.domain.camera.camera import Camera
 from ai_image_generation.domain.expression.expression import Expression
+from ai_image_generation.domain.pose.pose import Pose
 from ai_image_generation.domain.shoot.generate_shoot_patterns_output import (
     GenerateShootPatternsOutput,
 )
@@ -18,19 +19,19 @@ class GenerateShootPatterns:
         row_number = 0
         for subject in shoot.subjects:
             for camera in shoot.cameras:
-                if shoot.expressions.includes(camera):
-                    for expression in shoot.expressions.patterns:
+                for expression in self._expand_expressions(shoot, camera):
+                    for pose in self._expand_poses(shoot, camera):
                         row_number += 1
                         patterns.append(
                             self._to_output(
-                                shoot, camera, subject, expression, row_number
+                                shoot,
+                                camera,
+                                subject,
+                                expression,
+                                pose,
+                                row_number,
                             )
                         )
-                else:
-                    row_number += 1
-                    patterns.append(
-                        self._to_output(shoot, camera, subject, None, row_number)
-                    )
         return tuple(patterns)
 
     def _caption_prompt(
@@ -38,6 +39,7 @@ class GenerateShootPatterns:
         camera: Camera,
         subject: Subject,
         expression: Expression | None,
+        pose: Pose | None,
     ) -> str:
         caption = self._join(
             (subject.name,),
@@ -45,6 +47,7 @@ class GenerateShootPatterns:
             camera.angle.positive_features,
             camera.distance.positive_features,
             expression.positive_features if expression else (),
+            pose.positive_features if pose else (),
         )
         if not caption:
             raise ValueError(
@@ -53,25 +56,17 @@ class GenerateShootPatterns:
             )
         return caption
 
-    def _filename_prefix(
-        self,
-        row_number: int,
-        camera: Camera,
-        subject: Subject,
-        expression: Expression | None,
-    ) -> str:
-        parts = [
-            f"DS_LORA_{row_number:03d}",
-            subject.name,
-            self._slug(camera.angle.name),
-            self._slug(camera.distance.name),
-        ]
-        if expression is not None:
-            parts.append(self._slug(expression.name))
-        return "_".join(parts)
+    def _expand_expressions(
+        self, shoot: Shoot, camera: Camera
+    ) -> tuple[Expression | None, ...]:
+        if shoot.expressions.includes(camera):
+            return shoot.expressions.patterns
+        return (None,)
 
-    def _join(self, *groups: tuple[str, ...]) -> str:
-        return ", ".join(name for group in groups for name in group if name)
+    def _expand_poses(self, shoot: Shoot, camera: Camera) -> tuple[Pose | None, ...]:
+        if shoot.poses.includes(camera):
+            return shoot.poses.patterns
+        return (None,)
 
     def _feature_names(
         self, features: tuple[SubjectFeature, ...], *, weighted: bool = False
@@ -81,12 +76,36 @@ class GenerateShootPatterns:
             for feature in features
         )
 
+    def _filename_prefix(
+        self,
+        row_number: int,
+        camera: Camera,
+        subject: Subject,
+        expression: Expression | None,
+        pose: Pose | None,
+    ) -> str:
+        parts = [
+            f"DS_LORA_{row_number:03d}",
+            subject.name,
+            self._slug(camera.angle.name),
+            self._slug(camera.distance.name),
+        ]
+        if expression is not None:
+            parts.append(self._slug(expression.name))
+        if pose is not None:
+            parts.append(self._slug(pose.name))
+        return "_".join(parts)
+
+    def _join(self, *groups: tuple[str, ...]) -> str:
+        return ", ".join(name for group in groups for name in group if name)
+
     def _negative_prompt(
         self,
         shoot: Shoot,
         camera: Camera,
         subject: Subject,
         expression: Expression | None,
+        pose: Pose | None,
     ) -> str:
         return self._join(
             shoot.rating.negative_features if shoot.rating else (),
@@ -97,6 +116,7 @@ class GenerateShootPatterns:
             camera.angle.negative_features,
             camera.distance.negative_features,
             expression.negative_features if expression else (),
+            pose.negative_features if pose else (),
         )
 
     def _positive_prompt(
@@ -105,6 +125,7 @@ class GenerateShootPatterns:
         camera: Camera,
         subject: Subject,
         expression: Expression | None,
+        pose: Pose | None,
     ) -> str:
         return self._join(
             subject.kinds,
@@ -114,6 +135,7 @@ class GenerateShootPatterns:
             camera.angle.positive_features,
             camera.distance.positive_features,
             expression.positive_features if expression else (),
+            pose.positive_features if pose else (),
             shoot.scene.positive_features if shoot.scene else (),
             shoot.quality.positive_features if shoot.quality else (),
         )
@@ -127,17 +149,22 @@ class GenerateShootPatterns:
         camera: Camera,
         subject: Subject,
         expression: Expression | None,
+        pose: Pose | None,
         row_number: int,
     ) -> GenerateShootPatternsOutput:
         return GenerateShootPatternsOutput(
             filename_prefix=self._filename_prefix(
-                row_number, camera, subject, expression
+                row_number, camera, subject, expression, pose
             ),
             width=camera.frame.width,
             height=camera.frame.height,
-            positive_prompt=self._positive_prompt(shoot, camera, subject, expression),
-            negative_prompt=self._negative_prompt(shoot, camera, subject, expression),
-            caption_prompt=self._caption_prompt(camera, subject, expression),
+            positive_prompt=self._positive_prompt(
+                shoot, camera, subject, expression, pose
+            ),
+            negative_prompt=self._negative_prompt(
+                shoot, camera, subject, expression, pose
+            ),
+            caption_prompt=self._caption_prompt(camera, subject, expression, pose),
         )
 
     def _weighted_name(self, feature: SubjectFeature) -> str:

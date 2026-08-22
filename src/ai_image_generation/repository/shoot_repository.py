@@ -4,6 +4,7 @@ from ai_image_generation.domain.shoot.shoot import Shoot
 from ai_image_generation.repository.art_style_repository import ArtStyleRepository
 from ai_image_generation.repository.camera_repository import CameraRepository
 from ai_image_generation.repository.expression_repository import ExpressionRepository
+from ai_image_generation.repository.pose_repository import PoseRepository
 from ai_image_generation.repository.quality_repository import QualityRepository
 from ai_image_generation.repository.rating_repository import RatingRepository
 from ai_image_generation.repository.scene_repository import SceneRepository
@@ -16,6 +17,7 @@ class ShootRepository:
             cameras=CameraRepository().find(),
             subjects=SubjectRepository().find(),
             expressions=ExpressionRepository().find(),
+            poses=PoseRepository().find(),
             scene=self._scene(),
             art_style=ArtStyleRepository().find(),
             quality=QualityRepository().find(),
