@@ -1,13 +1,14 @@
 from typing import Any
 
+from ai_image_generation.config import Config
 from ai_image_generation.domain.expression.expression import Expression
 from ai_image_generation.domain.expression.expression_settings import ExpressionSettings
-from ai_image_generation.repository.json_io import read_json, shoot_json, to_string_tuple
+from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 
 class ExpressionRepository:
     def find(self) -> ExpressionSettings:
-        expression = read_json(shoot_json()).get("expression") or {}
+        expression = read_json(Config().shoot_json).get("expression") or {}
         skip = expression.get("skipCamera") or {}
         return ExpressionSettings(
             patterns=tuple(

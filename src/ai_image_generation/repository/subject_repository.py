@@ -1,18 +1,19 @@
 from typing import Any
 
+from ai_image_generation.config import Config
 from ai_image_generation.domain.subject.feature.subject_feature import (
     SubjectFeature,
     SubjectFeaturePolarity,
 )
 from ai_image_generation.domain.subject.subject import Subject
-from ai_image_generation.repository.json_io import read_json, shoot_json, to_string_tuple
+from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 
 class SubjectRepository:
     def find(self) -> tuple[Subject, ...]:
         return tuple(
             self._to_subject(item)
-            for item in read_json(shoot_json()).get("characters") or []
+            for item in read_json(Config().shoot_json).get("characters") or []
         )
 
     def _to_subject(self, data: dict[str, Any]) -> Subject:

@@ -4,10 +4,10 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
-from os import getenv
 from pathlib import Path
 from typing import Any
 
+from ai_image_generation.config import Config
 from ai_image_generation.repository.json_io import read_json
 
 LORA_TRAINING_IMAGE_CREATION_API_JSON = Path("art/lora-training-image-creation-api.json")
@@ -23,11 +23,9 @@ class ComfyUi:
         subfolder: str = ""
 
     def __init__(self) -> None:
-        url = (getenv("COMFY_UI_URL") or "").strip()
-        if not url:
-            raise ValueError("COMFY_UI_URL is not set.")
-        self._url = url.rstrip("/")
-        self._captions_directory = self._output_directory()
+        config = Config()
+        self._url = config.comfy_ui_url
+        self._captions_directory = config.output_directory
         self._template = read_json(LORA_TRAINING_IMAGE_CREATION_API_JSON)
 
     def generate_images(
@@ -88,16 +86,6 @@ class ComfyUi:
         if "completed" in status:
             return status["completed"] is True
         return status.get("status_str") == "success"
-
-    @staticmethod
-    def _output_directory() -> Path | None:
-        text = (getenv("OUTPUT_DIRECTORY") or "").strip()
-        if not text:
-            return None
-        path = Path(text).expanduser().resolve()
-        if not path.is_dir():
-            raise FileNotFoundError(f"OUTPUT_DIRECTORY not found: {path}")
-        return path
 
     def _request(
         self, method: str, path: str, body: dict[str, Any] | None = None

@@ -7,7 +7,7 @@ from ai_image_generation.domain.shoot.generate_shoot_patterns_output import (
 from ai_image_generation.infrastructure.comfy_ui import ComfyUi
 
 
-class GenerateLoraTrainingImages:
+class GenerateLoraTrainingImagesController:
     def execute(
         self,
         base_seed: int = 0,

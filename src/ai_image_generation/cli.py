@@ -5,8 +5,8 @@ from importlib.metadata import version
 
 from dotenv import load_dotenv
 
-from ai_image_generation.controller.generate_lora_training_images import (
-    GenerateLoraTrainingImages,
+from ai_image_generation.controller.generate_lora_training_images_controller import (
+    GenerateLoraTrainingImagesController,
 )
 
 
@@ -33,7 +33,7 @@ def main() -> None:
         help="1-based last prompt row to generate (inclusive). 0 means the last row.",
     )
     args = parser.parse_args()
-    GenerateLoraTrainingImages().execute(
+    GenerateLoraTrainingImagesController().execute(
         base_seed=args.base_seed,
         batch_size=args.batch_size,
         from_row=args.from_row,
