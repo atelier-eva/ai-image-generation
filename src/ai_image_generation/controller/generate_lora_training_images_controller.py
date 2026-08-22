@@ -44,6 +44,9 @@ class GenerateLoraTrainingImagesController:
                 seed,
                 args.batch_size,
             )
+            written = comfy_ui.write_images(images)
+            if written:
+                print(f"  images: {written}")
             written = comfy_ui.write_captions(images, pattern.caption_prompt)
             if written:
                 print(f"  captions: {written}")
