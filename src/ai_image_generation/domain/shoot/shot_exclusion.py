@@ -1,14 +1,12 @@
 from dataclasses import dataclass
 
-from ai_image_generation.domain.camera.angle.camera_angle import CameraAngleName
 from ai_image_generation.domain.camera.camera import Camera
-from ai_image_generation.domain.camera.distance.camera_distance import CameraDistanceName
 
 
 @dataclass
 class ShotExclusion:
-    angles: tuple[CameraAngleName, ...] = ()
-    distances: tuple[CameraDistanceName, ...] = ()
+    angles: tuple[str, ...] = ()
+    distances: tuple[str, ...] = ()
 
     def excludes(self, camera: Camera) -> bool:
         angle_ok = not self.angles or camera.angle.name in self.angles

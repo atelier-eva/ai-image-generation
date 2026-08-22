@@ -1,12 +1,8 @@
-from collections.abc import Iterator
 from dataclasses import dataclass
 
 from ai_image_generation.domain.art_style.art_style import ArtStyle
 from ai_image_generation.domain.camera.camera import Camera
 from ai_image_generation.domain.character.character import Character
-from ai_image_generation.domain.character.expression.character_expression import (
-    CharacterExpression,
-)
 from ai_image_generation.domain.character.feature.character_feature import (
     CharacterFeature,
 )
@@ -26,7 +22,7 @@ class ShootSettings:
     scene: Scene | None = None
     art_style: ArtStyle | None = None
     quality: Quality | None = None
-    rating: ContentRating = ContentRating.SAFE
+    rating: ContentRating | None = None
 
     def includes_expression_patterns(
         self, character: Character, camera: Camera
@@ -39,19 +35,6 @@ class ShootSettings:
 
     def is_excluded(self, camera: Camera) -> bool:
         return any(rule.excludes(camera) for rule in self.exclusions)
-
-    def iter_shots(
-        self,
-    ) -> Iterator[tuple[Camera, Character, CharacterExpression | None]]:
-        for camera in self.cameras:
-            if self.is_excluded(camera):
-                continue
-            for character in self.characters:
-                if self.includes_expression_patterns(character, camera):
-                    for expression in character.expressions:
-                        yield camera, character, expression
-                else:
-                    yield camera, character, None
 
     def filtered_features(
         self, character: Character, camera: Camera

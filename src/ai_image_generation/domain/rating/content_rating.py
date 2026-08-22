@@ -1,7 +1,8 @@
-from enum import Enum
+from dataclasses import dataclass
 
 
-class ContentRating(Enum):
-    SAFE = "safe"
-    SENSITIVE = "sensitive"
-    EXPLICIT = "explicit"
+@dataclass
+class ContentRating:
+    name: str
+    positive_features: tuple[str, ...] = ()
+    negative_features: tuple[str, ...] = ()

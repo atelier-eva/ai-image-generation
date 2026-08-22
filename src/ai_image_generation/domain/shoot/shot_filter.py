@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 
-from ai_image_generation.domain.camera.angle.camera_angle import CameraAngleName
 from ai_image_generation.domain.camera.camera import Camera
-from ai_image_generation.domain.camera.distance.camera_distance import CameraDistanceName
 from ai_image_generation.domain.character.feature.character_feature import (
     CharacterFeature,
 )
@@ -10,8 +8,8 @@ from ai_image_generation.domain.character.feature.character_feature import (
 
 @dataclass
 class ShotFilter:
-    angles: tuple[CameraAngleName, ...] = ()
-    distances: tuple[CameraDistanceName, ...] = ()
+    angles: tuple[str, ...] = ()
+    distances: tuple[str, ...] = ()
     exclude_expressions: bool = False
     feature: CharacterFeature | None = None
 
