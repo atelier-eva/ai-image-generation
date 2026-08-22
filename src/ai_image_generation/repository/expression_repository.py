@@ -9,10 +9,10 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 class ExpressionRepository:
     def find(self) -> ExpressionSettings:
         expression = read_json(Config().shoot_json).get("expression") or {}
-        skip = expression.get("skipCamera") or {}
+        skip = expression.get("skip_camera") or {}
         return ExpressionSettings(
             patterns=tuple(
-                self._to_expression(item) for item in expression.get("pattern") or []
+                self._to_expression(item) for item in expression.get("patterns") or []
             ),
             skip_angles=to_string_tuple(skip.get("angle")),
             skip_distances=to_string_tuple(skip.get("distance")),

@@ -1,0 +1,21 @@
+{
+  "files.eol": "\n",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.py[cod]": true,
+    "**/*.egg-info": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    ".venv": true
+  },
+  "files.watcherExclude": {
+    "**/__pycache__/**": true,
+    "**/.venv/**": true
+  },
+  "json.schemas": [
+  ],
+  "search.exclude": {
+    "**/.venv": true
+  }
+}

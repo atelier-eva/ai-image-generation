@@ -7,7 +7,7 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 class ArtStyleRepository:
     def find(self) -> ArtStyle:
-        return self._to_art_style(read_json(Config().art_style_json).get("artStyle"))
+        return self._to_art_style(read_json(Config().art_style_json).get("art_style"))
 
     def _to_art_style(self, data: Any) -> ArtStyle:
         if not data:

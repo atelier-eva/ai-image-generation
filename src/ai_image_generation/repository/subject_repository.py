@@ -35,7 +35,7 @@ class SubjectRepository:
     ) -> SubjectFeature:
         if isinstance(entry, str):
             return SubjectFeature(entry.strip(), polarity)
-        skip = entry.get("skipCamera") or {}
+        skip = entry.get("skip_camera") or {}
         return SubjectFeature(
             entry["tag"].strip(),
             polarity,

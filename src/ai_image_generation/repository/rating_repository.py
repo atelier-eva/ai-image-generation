@@ -12,14 +12,7 @@ class RatingRepository:
     def _to_rating(self, data: Any) -> ContentRating | None:
         if not data:
             return None
-        name = str(data.get("name") or "").strip()
-        if not name:
-            return None
-        positive = to_string_tuple(data.get("positive"))
-        if not positive:
-            positive = (name,)
         return ContentRating(
-            name=name,
-            positive_features=positive,
+            positive_features=to_string_tuple(data.get("positive")),
             negative_features=to_string_tuple(data.get("negative")),
         )

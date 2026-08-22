@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.spec/lora/lora-scene.schema.json",
+  "title": "LoRA scene (lora-scene.json)",
+  "description": "Background and lighting tags for generated prompts.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "background": { "$ref": "#/$defs/tagSet" },
+    "lighting": { "$ref": "#/$defs/tagSet" }
+  },
+  "$defs": {
+    "tagSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "positive": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "negative": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

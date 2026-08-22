@@ -1,0 +1,14 @@
+{
+  "camera": {
+    "angle": [],
+    "distance": []
+  },
+  "expression": {
+    "skip_camera": {
+      "angle": [],
+      "distance": []
+    },
+    "patterns": []
+  },
+  "characters": []
+}
