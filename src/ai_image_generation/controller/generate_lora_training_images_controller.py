@@ -17,9 +17,11 @@ class GenerateLoraTrainingImagesController:
     ) -> None:
         patterns = GenerateShootPatterns().execute()
         start, end = self._row_range(from_row, to_row, patterns)
+        print(f"Processing rows {start + 1}..{end} of {len(patterns)}.")
         comfy_ui = ComfyUi()
         for index in range(start, end):
             pattern = patterns[index]
+            print(f"[{index + 1}/{end}] {pattern.filename_prefix}")
             seed = base_seed + index * batch_size
             images = comfy_ui.generate_images(
                 pattern.filename_prefix,
@@ -30,7 +32,10 @@ class GenerateLoraTrainingImagesController:
                 seed,
                 batch_size,
             )
-            comfy_ui.write_captions(images, pattern.caption_prompt)
+            written = comfy_ui.write_captions(images, pattern.caption_prompt)
+            if written:
+                print(f"  captions: {written}")
+        print(f"Done. {end - start} rows.")
 
     def _row_range(
         self,
