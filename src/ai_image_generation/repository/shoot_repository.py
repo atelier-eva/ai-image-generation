@@ -1,5 +1,5 @@
 from ai_image_generation.domain.scene.scene import Scene
-from ai_image_generation.domain.shoot.shoot_settings import ShootSettings
+from ai_image_generation.domain.shoot.shoot import Shoot
 from ai_image_generation.repository.art_style_repository import ArtStyleRepository
 from ai_image_generation.repository.camera_repository import CameraRepository
 from ai_image_generation.repository.expression_repository import ExpressionRepository
@@ -15,14 +15,14 @@ from ai_image_generation.repository.scene_repository import SceneRepository
 from ai_image_generation.repository.subject_repository import SubjectRepository
 
 
-class ShootSettingsRepository:
+class ShootRepository:
     ART_STYLE_JSON = ART_STYLE_JSON
     DIRECTORY = DIRECTORY
     SCENE_JSON = SCENE_JSON
     SHOOT_JSON = SHOOT_JSON
 
-    def find(self) -> ShootSettings:
-        return ShootSettings(
+    def find(self) -> Shoot:
+        return Shoot(
             cameras=CameraRepository().find(),
             subjects=SubjectRepository().find(),
             expressions=ExpressionRepository().find(),

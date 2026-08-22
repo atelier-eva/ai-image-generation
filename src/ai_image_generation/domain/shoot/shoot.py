@@ -11,7 +11,7 @@ from ai_image_generation.domain.subject.subject import Subject
 
 
 @dataclass
-class ShootSettings:
+class Shoot:
     cameras: tuple[Camera, ...] = ()
     subjects: tuple[Subject, ...] = ()
     expressions: ExpressionSettings = field(default_factory=ExpressionSettings)
