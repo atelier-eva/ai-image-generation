@@ -5,9 +5,10 @@ from pathlib import Path
 class Config:
     DEFAULT_INPUT_DIRECTORY = "ai-image-generation"
     DEFAULT_OUTPUT_DIRECTORY = "output"
+    LORA_TRAINING_DIRECTORY = "lora-training"
 
     def __init__(self) -> None:
-        directory = _directory("INPUT_DIRECTORY")
+        directory = _directory("INPUT_DIRECTORY") / self.LORA_TRAINING_DIRECTORY
         self.art_style_json = directory / "art-style.json"
         self.scene_json = directory / "scene.json"
         self.shoot_json = directory / "shoot.json"

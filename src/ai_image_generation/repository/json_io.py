@@ -7,6 +7,8 @@ from typing import Any
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError, best_match
 
+from ai_image_generation.config import Config
+
 _SCHEMA_FILES = {
     "art-style.json": "art-style.schema.json",
     "scene.json": "scene.schema.json",
@@ -47,7 +49,7 @@ def _validator(json_name: str) -> Draft202012Validator | None:
         return None
     schema = json.loads(
         files("ai_image_generation.resources")
-        .joinpath(schema_name)
+        .joinpath(Config.LORA_TRAINING_DIRECTORY, schema_name)
         .read_text(encoding="utf-8")
     )
     Draft202012Validator.check_schema(schema)

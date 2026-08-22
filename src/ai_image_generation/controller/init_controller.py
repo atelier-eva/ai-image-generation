@@ -18,7 +18,8 @@ class InitController:
         parser.add_argument(
             "--directory",
             help=(
-                "Directory for input JSON files. "
+                "Root directory for feature input folders. "
+                f"LoRA templates go in {Config.LORA_TRAINING_DIRECTORY}/. "
                 f"Defaults to INPUT_DIRECTORY or {Config.DEFAULT_INPUT_DIRECTORY}."
             ),
         )
@@ -37,8 +38,10 @@ class InitController:
             raise ValueError("INPUT_DIRECTORY is not set.")
         path = Path(text).expanduser().resolve()
         path.mkdir(parents=True, exist_ok=True)
+        lora_training = path / Config.LORA_TRAINING_DIRECTORY
+        lora_training.mkdir(parents=True, exist_ok=True)
         for name in _JSON_FILES:
-            self._write_json(path / name, args.force)
+            self._write_json(lora_training / name, args.force)
         self._write_env(text)
         print(f"Input directory: {path}")
         print("Fill in the JSON tags, then run: ai-image-generation generate")
@@ -82,7 +85,10 @@ class InitController:
         if existed and not force:
             print(f"Skipped existing: {destination}")
             return
-        source = files("ai_image_generation.resources").joinpath(destination.name)
+        source = files("ai_image_generation.resources").joinpath(
+            Config.LORA_TRAINING_DIRECTORY,
+            destination.name,
+        )
         destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
         action = "Overwrote" if existed else "Created"
         print(f"{action}: {destination}")
