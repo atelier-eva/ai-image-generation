@@ -1,49 +1,31 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ai_image_generation.domain.art_style.art_style import ArtStyle
 from ai_image_generation.domain.camera.camera import Camera
-from ai_image_generation.domain.character.character import Character
-from ai_image_generation.domain.character.feature.character_feature import (
-    CharacterFeature,
-)
+from ai_image_generation.domain.expression.expression_settings import ExpressionSettings
 from ai_image_generation.domain.quality.quality import Quality
 from ai_image_generation.domain.rating.content_rating import ContentRating
 from ai_image_generation.domain.scene.scene import Scene
-from ai_image_generation.domain.shoot.shot_exclusion import ShotExclusion
-from ai_image_generation.domain.shoot.shot_filter import ShotFilter
+from ai_image_generation.domain.subject.feature.subject_feature import SubjectFeature
+from ai_image_generation.domain.subject.subject import Subject
 
 
 @dataclass
 class ShootSettings:
     cameras: tuple[Camera, ...] = ()
-    characters: tuple[Character, ...] = ()
-    exclusions: tuple[ShotExclusion, ...] = ()
-    filters: tuple[ShotFilter, ...] = ()
+    subjects: tuple[Subject, ...] = ()
+    expressions: ExpressionSettings = field(default_factory=ExpressionSettings)
     scene: Scene | None = None
     art_style: ArtStyle | None = None
     quality: Quality | None = None
     rating: ContentRating | None = None
 
-    def includes_expression_patterns(
-        self, character: Character, camera: Camera
-    ) -> bool:
-        if any(
-            rule.exclude_expressions and rule.applies_to(camera) for rule in self.filters
-        ):
-            return False
-        return bool(character.expressions)
-
-    def is_excluded(self, camera: Camera) -> bool:
-        return any(rule.excludes(camera) for rule in self.exclusions)
+    def includes_expression_patterns(self, camera: Camera) -> bool:
+        return self.expressions.includes(camera)
 
     def filtered_features(
-        self, character: Character, camera: Camera
-    ) -> tuple[CharacterFeature, ...]:
-        hidden = [
-            rule.feature
-            for rule in self.filters
-            if rule.feature is not None and rule.applies_to(camera)
-        ]
+        self, subject: Subject, camera: Camera
+    ) -> tuple[SubjectFeature, ...]:
         return tuple(
-            feature for feature in character.features if feature not in hidden
+            feature for feature in subject.features if not feature.skips(camera)
         )

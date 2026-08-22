@@ -6,10 +6,12 @@ from ai_image_generation.repository.json_io import ART_STYLE_JSON, read_json, to
 
 class QualityRepository:
     def find(self) -> Quality:
-        return self._to_quality(read_json(ART_STYLE_JSON))
+        return self._to_quality(read_json(ART_STYLE_JSON).get("quality"))
 
-    def _to_quality(self, data: dict[str, Any]) -> Quality:
-        positive = data.get("positive") or {}
+    def _to_quality(self, data: Any) -> Quality:
+        if not data:
+            return Quality()
         return Quality(
-            positive_features=to_string_tuple(positive.get("suffix")),
+            positive_features=to_string_tuple(data.get("positive")),
+            negative_features=to_string_tuple(data.get("negative")),
         )
