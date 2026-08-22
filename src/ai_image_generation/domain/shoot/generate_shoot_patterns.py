@@ -19,8 +19,8 @@ class GenerateShootPatterns:
         row_number = 0
         for subject in shoot.subjects:
             for camera in shoot.cameras:
-                for expression in self._expressions(shoot, camera):
-                    for pose in self._poses(shoot, camera):
+                for expression in self._expand_expressions(shoot, camera):
+                    for pose in self._expand_poses(shoot, camera):
                         row_number += 1
                         patterns.append(
                             self._to_output(
@@ -56,12 +56,25 @@ class GenerateShootPatterns:
             )
         return caption
 
-    def _expressions(
+    def _expand_expressions(
         self, shoot: Shoot, camera: Camera
     ) -> tuple[Expression | None, ...]:
         if shoot.expressions.includes(camera):
             return shoot.expressions.patterns
         return (None,)
+
+    def _expand_poses(self, shoot: Shoot, camera: Camera) -> tuple[Pose | None, ...]:
+        if shoot.poses.includes(camera):
+            return shoot.poses.patterns
+        return (None,)
+
+    def _feature_names(
+        self, features: tuple[SubjectFeature, ...], *, weighted: bool = False
+    ) -> tuple[str, ...]:
+        return tuple(
+            self._weighted_name(feature) if weighted else feature.name
+            for feature in features
+        )
 
     def _filename_prefix(
         self,
@@ -86,14 +99,6 @@ class GenerateShootPatterns:
     def _join(self, *groups: tuple[str, ...]) -> str:
         return ", ".join(name for group in groups for name in group if name)
 
-    def _feature_names(
-        self, features: tuple[SubjectFeature, ...], *, weighted: bool = False
-    ) -> tuple[str, ...]:
-        return tuple(
-            self._weighted_name(feature) if weighted else feature.name
-            for feature in features
-        )
-
     def _negative_prompt(
         self,
         shoot: Shoot,
@@ -113,11 +118,6 @@ class GenerateShootPatterns:
             expression.negative_features if expression else (),
             pose.negative_features if pose else (),
         )
-
-    def _poses(self, shoot: Shoot, camera: Camera) -> tuple[Pose | None, ...]:
-        if shoot.poses.includes(camera):
-            return shoot.poses.patterns
-        return (None,)
 
     def _positive_prompt(
         self,
