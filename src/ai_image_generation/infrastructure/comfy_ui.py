@@ -2,6 +2,7 @@ import copy
 import json
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
@@ -25,7 +26,7 @@ class ComfyUi:
     def __init__(self) -> None:
         config = Config()
         self._url = config.comfy_ui_url
-        self._captions_directory = config.output_directory
+        self._output_directory = config.output_directory
         self._template = read_json(LORA_TRAINING_IMAGE_CREATION_API_JSON)
 
     def generate_images(
@@ -56,14 +57,31 @@ class ComfyUi:
             raise RuntimeError("ComfyUI /prompt did not return prompt_id.")
         return self._wait_until_complete(prompt_id)
 
+    def fetch_image(self, image: "ComfyUi.SavedImage") -> bytes:
+        query = urllib.parse.urlencode(
+            {
+                "filename": image.filename,
+                "subfolder": image.subfolder,
+                "type": "output",
+            }
+        )
+        request = urllib.request.Request(f"{self._url}/view?{query}", method="GET")
+        try:
+            with urllib.request.urlopen(request) as response:
+                return response.read()
+        except urllib.error.HTTPError as error:
+            raise RuntimeError(
+                f"ComfyUI /view failed for {image.filename}: {error.code}"
+            ) from error
+        except urllib.error.URLError as error:
+            raise RuntimeError(f"ComfyUI is not reachable at {self._url}") from error
+
     def write_captions(
         self,
         images: tuple["ComfyUi.SavedImage", ...],
         caption: str,
     ) -> int:
-        directory = self._captions_directory
-        if directory is None:
-            return 0
+        directory = self._output_directory
         text = caption.strip()
         if not text:
             raise ValueError("caption_prompt is empty or missing.")
@@ -79,6 +97,20 @@ class ComfyUi:
                 raise FileNotFoundError(f"Image not found for caption: {image_path}")
             caption_path = image_dir / f"{image_path.stem}.txt"
             caption_path.write_text(text, encoding="utf-8", newline="\n")
+            written += 1
+        return written
+
+    def write_images(self, images: tuple["ComfyUi.SavedImage", ...]) -> int:
+        directory = self._output_directory
+        if not images:
+            raise RuntimeError(
+                "No saved images in ComfyUI history; cannot write images."
+            )
+        written = 0
+        for image in images:
+            image_dir = directory / image.subfolder if image.subfolder else directory
+            image_dir.mkdir(parents=True, exist_ok=True)
+            (image_dir / image.filename).write_bytes(self.fetch_image(image))
             written += 1
         return written
 

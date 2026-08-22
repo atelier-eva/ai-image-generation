@@ -16,15 +16,15 @@
   "json.schemas": [
     {
       "fileMatch": ["**/art-style.json"],
-      "url": "./src/ai_image_generation/resources/art-style.schema.json"
+      "url": "./src/ai_image_generation/resources/lora-training/art-style.schema.json"
     },
     {
       "fileMatch": ["**/shoot.json"],
-      "url": "./src/ai_image_generation/resources/shoot.schema.json"
+      "url": "./src/ai_image_generation/resources/lora-training/shoot.schema.json"
     },
     {
       "fileMatch": ["**/scene.json"],
-      "url": "./src/ai_image_generation/resources/scene.schema.json"
+      "url": "./src/ai_image_generation/resources/lora-training/scene.schema.json"
     }
   ],
   "search.exclude": {
