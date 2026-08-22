@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "eamodio.gitlens",
+    "redhat.vscode-yaml",
+    "shd101wyy.markdown-preview-enhanced"
+  ],
+  "unwantedRecommendations": []
+}

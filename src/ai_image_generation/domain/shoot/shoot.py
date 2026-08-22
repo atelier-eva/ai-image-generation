@@ -1,22 +1,20 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ai_image_generation.domain.art_style.art_style import ArtStyle
 from ai_image_generation.domain.camera.camera import Camera
-from ai_image_generation.domain.character.character import Character
+from ai_image_generation.domain.expression.expression_settings import ExpressionSettings
 from ai_image_generation.domain.quality.quality import Quality
 from ai_image_generation.domain.rating.content_rating import ContentRating
 from ai_image_generation.domain.scene.scene import Scene
-from ai_image_generation.domain.shoot.shot_exclusion_settings import (
-    ShotExclusionSettings,
-)
+from ai_image_generation.domain.subject.subject import Subject
 
 
 @dataclass
-class ShootSettings:
+class Shoot:
     cameras: tuple[Camera, ...] = ()
-    characters: tuple[Character, ...] = ()
-    exclusions: tuple[ShotExclusionSettings, ...] = ()
+    subjects: tuple[Subject, ...] = ()
+    expressions: ExpressionSettings = field(default_factory=ExpressionSettings)
     scene: Scene | None = None
     art_style: ArtStyle | None = None
     quality: Quality | None = None
-    rating: ContentRating = ContentRating.SAFE
+    rating: ContentRating | None = None

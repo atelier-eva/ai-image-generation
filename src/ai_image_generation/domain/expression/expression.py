@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class CharacterExpression:
+class Expression:
     name: str
     positive_features: tuple[str, ...] = ()
     negative_features: tuple[str, ...] = ()

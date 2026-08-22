@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.spec/art-style.schema.json",
+  "title": "Art style (art-style.json)",
+  "description": "Art style, quality, and rating tags for generated prompts.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "art_style": { "$ref": "#/$defs/tagSet" },
+    "quality": { "$ref": "#/$defs/tagSet" },
+    "rating": { "$ref": "#/$defs/tagSet" }
+  },
+  "$defs": {
+    "tagSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "positive": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "negative": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

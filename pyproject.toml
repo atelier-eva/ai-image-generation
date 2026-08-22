@@ -4,7 +4,10 @@ version = "0.1.0"
 description = "Domain models for AI image generation prompts (camera, character, and shoot settings)"
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "jsonschema>=4.26.0",
+    "python-dotenv>=1.2.3",
+]
 
 [project.scripts]
 ai-image-generation = "ai_image_generation.cli:main"

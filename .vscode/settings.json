@@ -1,0 +1,33 @@
+{
+  "files.eol": "\n",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.py[cod]": true,
+    "**/*.egg-info": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    ".venv": true
+  },
+  "files.watcherExclude": {
+    "**/__pycache__/**": true,
+    "**/.venv/**": true
+  },
+  "json.schemas": [
+    {
+      "fileMatch": ["**/art-style.json"],
+      "url": "./src/ai_image_generation/resources/art-style.schema.json"
+    },
+    {
+      "fileMatch": ["**/shoot.json"],
+      "url": "./src/ai_image_generation/resources/shoot.schema.json"
+    },
+    {
+      "fileMatch": ["**/scene.json"],
+      "url": "./src/ai_image_generation/resources/scene.schema.json"
+    }
+  ],
+  "search.exclude": {
+    "**/.venv": true
+  }
+}

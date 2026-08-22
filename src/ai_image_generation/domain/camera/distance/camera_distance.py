@@ -1,15 +1,11 @@
 from dataclasses import dataclass
-from enum import Enum
 
-
-class CameraDistanceName(Enum):
-    FULL_BODY = "full_body"
-    FACE_CLOSE_UP = "face_close_up"
-    BUST_UP = "bust_up"
+from ai_image_generation.domain.camera.frame.camera_frame import CameraFrame
 
 
 @dataclass
 class CameraDistance:
-    name: CameraDistanceName
+    name: str
+    frame: CameraFrame
     positive_features: tuple[str, ...] = ()
     negative_features: tuple[str, ...] = ()
