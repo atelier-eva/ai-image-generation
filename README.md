@@ -3,5 +3,5 @@
 ## インストール
 
 ```bash
-uv tool install ai-image-generation --from git+https://github.com/atelier-eva/ai-image-generation-tool.git
+uv tool install git+https://github.com/atelier-eva/ai-image-generation.git
 ```
