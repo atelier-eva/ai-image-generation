@@ -2,6 +2,7 @@
 
 from argparse import ArgumentParser
 from importlib.metadata import version
+from pathlib import Path
 from sys import argv
 
 from dotenv import load_dotenv
@@ -13,7 +14,7 @@ from ai_image_generation.controller.init_controller import InitController
 
 
 def main() -> None:
-    load_dotenv()
+    load_dotenv(Path.cwd() / ".env")
     arguments = argv[1:]
     command = arguments[0] if arguments else ""
     if command == "init":
