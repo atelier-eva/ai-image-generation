@@ -11,7 +11,7 @@ _JSON_FILES = (
 )
 
 
-class InitInputDirectoryController:
+class InitController:
     def execute(self, directory: str | None = None, force: bool = False) -> None:
         text = (
             directory or getenv("INPUT_DIRECTORY") or Config.DEFAULT_INPUT_DIRECTORY

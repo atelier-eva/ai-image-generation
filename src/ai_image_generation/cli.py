@@ -10,9 +10,7 @@ from ai_image_generation.config import Config
 from ai_image_generation.controller.generate_lora_training_images_controller import (
     GenerateLoraTrainingImagesController,
 )
-from ai_image_generation.controller.init_input_directory_controller import (
-    InitInputDirectoryController,
-)
+from ai_image_generation.controller.init_controller import InitController
 
 _COMMANDS = frozenset({"generate", "init"})
 
@@ -22,7 +20,7 @@ def main() -> None:
     parser = _parser()
     args = parser.parse_args(_with_default_command(argv[1:]))
     if args.command == "init":
-        InitInputDirectoryController().execute(
+        InitController().execute(
             directory=args.directory,
             force=args.force,
         )
