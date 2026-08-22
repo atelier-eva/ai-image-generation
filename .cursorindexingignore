@@ -1,0 +1,17 @@
+# Exclude from codebase index only. Agent can still open or @-mention these.
+
+# Editor / Cursor config (not application source)
+.cursor/
+.vscode/
+
+# Lockfile is tracked but noisy for search
+uv.lock
+
+# Generated images and local run output
+output/
+outputs/
+*.gif
+*.png
+*.jpg
+*.jpeg
+*.webp

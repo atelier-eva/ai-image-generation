@@ -1,0 +1,22 @@
+# Cursor cannot index, @-mention, or read these files.
+# Syntax matches .gitignore. Cursor also honors .gitignore.
+
+# Secrets (keep .env.example available as a template)
+.env
+.env.*
+!.env.example
+
+# Keys and credential dumps
+*.pem
+*.key
+*.p12
+credentials.json
+secrets.json
+
+# Python / tool caches
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
