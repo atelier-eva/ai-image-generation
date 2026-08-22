@@ -1,6 +1,8 @@
+from argparse import ArgumentParser
 from importlib.resources import files
 from os import getenv
 from pathlib import Path
+from sys import argv
 
 from ai_image_generation.config import Config
 
@@ -12,16 +14,31 @@ _JSON_FILES = (
 
 
 class InitController:
-    def execute(self, directory: str | None = None, force: bool = False) -> None:
+    def execute(self, parser: ArgumentParser) -> None:
+        parser.add_argument(
+            "--directory",
+            help=(
+                "Directory for input JSON files. "
+                f"Defaults to INPUT_DIRECTORY or {Config.DEFAULT_INPUT_DIRECTORY}."
+            ),
+        )
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Overwrite existing JSON files.",
+        )
+        args = parser.parse_args(argv[2:])
         text = (
-            directory or getenv("INPUT_DIRECTORY") or Config.DEFAULT_INPUT_DIRECTORY
+            args.directory
+            or getenv("INPUT_DIRECTORY")
+            or Config.DEFAULT_INPUT_DIRECTORY
         ).strip()
         if not text:
             raise ValueError("INPUT_DIRECTORY is not set.")
         path = Path(text).expanduser().resolve()
         path.mkdir(parents=True, exist_ok=True)
         for name in _JSON_FILES:
-            self._write_json(path / name, force)
+            self._write_json(path / name, args.force)
         self._write_env(text)
         print(f"Input directory: {path}")
         print("Fill in the JSON tags, then run: ai-image-generation generate")

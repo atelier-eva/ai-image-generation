@@ -1,3 +1,6 @@
+from argparse import ArgumentParser
+from sys import argv
+
 from ai_image_generation.domain.shoot.generate_shoot_patterns import (
     GenerateShootPatterns,
 )
@@ -8,21 +11,30 @@ from ai_image_generation.infrastructure.comfy_ui import ComfyUi
 
 
 class GenerateLoraTrainingImagesController:
-    def execute(
-        self,
-        base_seed: int = 0,
-        batch_size: int = 4,
-        from_row: int = 1,
-        to_row: int = 0,
-    ) -> None:
+    def execute(self, parser: ArgumentParser) -> None:
+        parser.add_argument("--base-seed", type=int, default=0)
+        parser.add_argument("--batch-size", type=int, default=4)
+        parser.add_argument(
+            "--from-row",
+            type=int,
+            default=1,
+            help="1-based first prompt row to generate (inclusive).",
+        )
+        parser.add_argument(
+            "--to-row",
+            type=int,
+            default=0,
+            help="1-based last prompt row to generate (inclusive). 0 means the last row.",
+        )
+        args = parser.parse_args(argv[2:])
         patterns = GenerateShootPatterns().execute()
-        start, end = self._row_range(from_row, to_row, patterns)
+        start, end = self._row_range(args.from_row, args.to_row, patterns)
         print(f"Processing rows {start + 1}..{end} of {len(patterns)}.")
         comfy_ui = ComfyUi()
         for index in range(start, end):
             pattern = patterns[index]
             print(f"[{index + 1}/{end}] {pattern.filename_prefix}")
-            seed = base_seed + index * batch_size
+            seed = args.base_seed + index * args.batch_size
             images = comfy_ui.generate_images(
                 pattern.filename_prefix,
                 pattern.width,
@@ -30,7 +42,7 @@ class GenerateLoraTrainingImagesController:
                 pattern.positive_prompt,
                 pattern.negative_prompt,
                 seed,
-                batch_size,
+                args.batch_size,
             )
             written = comfy_ui.write_captions(images, pattern.caption_prompt)
             if written:
