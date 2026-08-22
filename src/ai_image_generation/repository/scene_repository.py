@@ -5,12 +5,12 @@ from ai_image_generation.domain.scene.background.scene_background import (
 )
 from ai_image_generation.domain.scene.lighting.scene_lighting import SceneLighting
 from ai_image_generation.domain.scene.scene import Scene
-from ai_image_generation.repository.json_io import SCENE_JSON, read_json, to_string_tuple
+from ai_image_generation.repository.json_io import read_json, scene_json, to_string_tuple
 
 
 class SceneRepository:
     def find(self) -> Scene:
-        data = read_json(SCENE_JSON)
+        data = read_json(scene_json())
         return Scene(
             background=self._to_background(data.get("background")),
             lighting=self._to_lighting(data.get("lighting")),

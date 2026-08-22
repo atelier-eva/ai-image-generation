@@ -1,11 +1,19 @@
 import json
+from os import getenv
 from pathlib import Path
 from typing import Any
 
-DIRECTORY = Path("ai-image-generation")
-ART_STYLE_JSON = DIRECTORY / "art-style.json"
-SCENE_JSON = DIRECTORY / "scene.json"
-SHOOT_JSON = DIRECTORY / "shoot.json"
+
+def art_style_json() -> Path:
+    return _input_directory() / "art-style.json"
+
+
+def scene_json() -> Path:
+    return _input_directory() / "scene.json"
+
+
+def shoot_json() -> Path:
+    return _input_directory() / "shoot.json"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -21,3 +29,13 @@ def to_string_tuple(value: Any) -> tuple[str, ...]:
     if value is None:
         return ()
     return tuple(tag.strip() for tag in value if str(tag).strip())
+
+
+def _input_directory() -> Path:
+    value = (getenv("INPUT_DIRECTORY") or "").strip()
+    if not value:
+        raise ValueError("INPUT_DIRECTORY is not set.")
+    path = Path(value).expanduser().resolve()
+    if not path.is_dir():
+        raise FileNotFoundError(f"INPUT_DIRECTORY not found: {path}")
+    return path

@@ -3,6 +3,8 @@ import json
 import time
 import urllib.error
 import urllib.request
+from dataclasses import dataclass
+from os import getenv
 from pathlib import Path
 from typing import Any
 
@@ -15,8 +17,17 @@ class ComfyUi:
     _POLL_INTERVAL_SECONDS = 2
     _POLL_TIMEOUT_SECONDS = 600
 
-    def __init__(self, url: str = "http://127.0.0.1:8188") -> None:
+    @dataclass
+    class SavedImage:
+        filename: str
+        subfolder: str = ""
+
+    def __init__(self) -> None:
+        url = (getenv("COMFY_UI_URL") or "").strip()
+        if not url:
+            raise ValueError("COMFY_UI_URL is not set.")
         self._url = url.rstrip("/")
+        self._captions_directory = self._output_directory()
         self._template = read_json(LORA_TRAINING_IMAGE_CREATION_API_JSON)
 
     def generate_images(
@@ -28,7 +39,7 @@ class ComfyUi:
         negative_prompt: str,
         seed: int,
         batch_size: int = 4,
-    ) -> dict[str, Any]:
+    ) -> tuple["ComfyUi.SavedImage", ...]:
         workflow = self._workflow(
             filename_prefix,
             width,
@@ -47,19 +58,46 @@ class ComfyUi:
             raise RuntimeError("ComfyUI /prompt did not return prompt_id.")
         return self._wait_until_complete(prompt_id)
 
+    def write_captions(
+        self,
+        images: tuple["ComfyUi.SavedImage", ...],
+        caption: str,
+    ) -> int:
+        directory = self._captions_directory
+        if directory is None:
+            return 0
+        text = caption.strip()
+        if not text:
+            raise ValueError("caption_prompt is empty or missing.")
+        if not images:
+            raise RuntimeError(
+                "No saved images in ComfyUI history; cannot write captions."
+            )
+        written = 0
+        for image in images:
+            image_dir = directory / image.subfolder if image.subfolder else directory
+            image_path = image_dir / image.filename
+            if not image_path.is_file():
+                raise FileNotFoundError(f"Image not found for caption: {image_path}")
+            caption_path = image_dir / f"{image_path.stem}.txt"
+            caption_path.write_text(text, encoding="utf-8", newline="\n")
+            written += 1
+        return written
+
     def _completed(self, status: dict[str, Any]) -> bool:
         if "completed" in status:
             return status["completed"] is True
         return status.get("status_str") == "success"
 
-    def _image_names(self, entry: dict[str, Any]) -> tuple[str, ...]:
-        names: list[str] = []
-        for output in (entry.get("outputs") or {}).values():
-            for image in output.get("images") or []:
-                filename = str(image.get("filename") or "").strip()
-                if filename:
-                    names.append(filename)
-        return tuple(names)
+    @staticmethod
+    def _output_directory() -> Path | None:
+        text = (getenv("OUTPUT_DIRECTORY") or "").strip()
+        if not text:
+            return None
+        path = Path(text).expanduser().resolve()
+        if not path.is_dir():
+            raise FileNotFoundError(f"OUTPUT_DIRECTORY not found: {path}")
+        return path
 
     def _request(
         self, method: str, path: str, body: dict[str, Any] | None = None
@@ -84,7 +122,22 @@ class ComfyUi:
             raise RuntimeError(f"ComfyUI {path} did not return an object.")
         return loaded
 
-    def _wait_until_complete(self, prompt_id: str) -> dict[str, Any]:
+    def _saved_images(self, entry: dict[str, Any]) -> tuple["ComfyUi.SavedImage", ...]:
+        images: list[ComfyUi.SavedImage] = []
+        for output in (entry.get("outputs") or {}).values():
+            for image in output.get("images") or []:
+                filename = str(image.get("filename") or "").strip()
+                if not filename:
+                    continue
+                images.append(
+                    ComfyUi.SavedImage(
+                        filename=filename,
+                        subfolder=str(image.get("subfolder") or ""),
+                    )
+                )
+        return tuple(images)
+
+    def _wait_until_complete(self, prompt_id: str) -> tuple["ComfyUi.SavedImage", ...]:
         deadline = time.monotonic() + self._POLL_TIMEOUT_SECONDS
         while time.monotonic() < deadline:
             time.sleep(self._POLL_INTERVAL_SECONDS)
@@ -97,8 +150,9 @@ class ComfyUi:
                 raise RuntimeError(f"ComfyUI generation failed: {status.get('messages')}")
             if not self._completed(status):
                 continue
-            if self._image_names(entry):
-                return entry
+            images = self._saved_images(entry)
+            if images:
+                return images
         raise TimeoutError(
             f"Timed out after {self._POLL_TIMEOUT_SECONDS}s waiting for image outputs "
             f"from prompt_id {prompt_id}."
