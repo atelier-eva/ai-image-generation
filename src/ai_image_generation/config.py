@@ -3,6 +3,8 @@ from pathlib import Path
 
 
 class Config:
+    DEFAULT_INPUT_DIRECTORY = "ai-image-generation"
+
     def __init__(self) -> None:
         directory = _directory("INPUT_DIRECTORY")
         self.art_style_json = directory / "art-style.json"
