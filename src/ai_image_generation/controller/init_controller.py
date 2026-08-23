@@ -8,6 +8,8 @@ from ai_image_generation.config import Config
 
 _JSON_FILES = (
     "art-style.json",
+    "expression.json",
+    "pose.json",
     "scene.json",
     "shoot.json",
 )

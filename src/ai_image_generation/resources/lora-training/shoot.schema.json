@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://local.spec/shoot.schema.json",
   "title": "Shoot (shoot.json)",
-  "description": "Prompt tag definitions for camera, expression, pose, and character combinations.",
+  "description": "Prompt tag definitions for camera and character combinations.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -12,7 +12,7 @@
       "properties": {
         "angle": {
           "type": "array",
-          "items": { "$ref": "#/$defs/namedTagSet" }
+          "items": { "$ref": "#/$defs/named_tag_set" }
         },
         "distance": {
           "type": "array",
@@ -43,34 +43,6 @@
         }
       }
     },
-    "expression": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "skip_camera": {
-          "$ref": "#/$defs/skip_camera",
-          "description": "When angle or distance name matches (OR), emit one row per character without expression tags instead of iterating expression.patterns."
-        },
-        "patterns": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/namedTagSet" }
-        }
-      }
-    },
-    "pose": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "skip_camera": {
-          "$ref": "#/$defs/skip_camera",
-          "description": "When angle or distance name matches (OR), emit one row per character without pose tags instead of iterating pose.patterns."
-        },
-        "patterns": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/namedTagSet" }
-        }
-      }
-    },
     "characters": {
       "type": "array",
       "items": {
@@ -88,7 +60,7 @@
               { "type": "string", "minLength": 1 },
               { "$ref": "#/$defs/tags" }
             ],
-            "description": "Subject tags emitted first in positive_prompt only (e.g. 1girl); omitted from caption_prompt"
+            "description": "Subject tags emitted first in positive_prompt and immediately after name in caption_prompt (e.g. 1girl)"
           },
           "positive": {
             "type": "array",
@@ -144,7 +116,7 @@
         }
       }
     },
-    "namedTagSet": {
+    "named_tag_set": {
       "type": "object",
       "additionalProperties": false,
       "required": ["name"],

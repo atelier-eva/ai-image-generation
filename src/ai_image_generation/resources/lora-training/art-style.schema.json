@@ -2,27 +2,49 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://local.spec/art-style.schema.json",
   "title": "Art style (art-style.json)",
-  "description": "Art style, quality, and rating tags for generated prompts.",
+  "description": "Art style patterns, quality, and rating tags for generated prompts.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "art_style": { "$ref": "#/$defs/tagSet" },
-    "quality": { "$ref": "#/$defs/tagSet" },
-    "rating": { "$ref": "#/$defs/tagSet" }
-  },
-  "$defs": {
-    "tagSet": {
+    "art_style": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "positive": {
+        "patterns": {
           "type": "array",
-          "items": { "type": "string", "minLength": 1 }
-        },
-        "negative": {
-          "type": "array",
-          "items": { "type": "string", "minLength": 1 }
+          "items": { "$ref": "#/$defs/named_tag_set" },
+          "description": "One generated row per pattern, after pose. Empty or omitted emits one row without art style tags. positive is used in positive_prompt and caption_prompt; negative is used in negative_prompt only."
         }
+      }
+    },
+    "quality": { "$ref": "#/$defs/tag_set" },
+    "rating": { "$ref": "#/$defs/tag_set" }
+  },
+  "$defs": {
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "tag_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "positive": { "$ref": "#/$defs/tags" },
+        "negative": { "$ref": "#/$defs/tags" }
+      }
+    },
+    "named_tag_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable identifier; used in filename_prefix. When positive is omitted or empty, name is the sole positive tag."
+        },
+        "positive": { "$ref": "#/$defs/tags" },
+        "negative": { "$ref": "#/$defs/tags" }
       }
     }
   }

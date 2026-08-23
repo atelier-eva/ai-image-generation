@@ -6,11 +6,11 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "background": { "$ref": "#/$defs/tagSet" },
-    "lighting": { "$ref": "#/$defs/tagSet" }
+    "background": { "$ref": "#/$defs/tag_set" },
+    "lighting": { "$ref": "#/$defs/tag_set" }
   },
   "$defs": {
-    "tagSet": {
+    "tag_set": {
       "type": "object",
       "additionalProperties": false,
       "properties": {

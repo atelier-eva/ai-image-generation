@@ -10,6 +10,8 @@ class Config:
     def __init__(self) -> None:
         directory = _directory("INPUT_DIRECTORY") / self.LORA_TRAINING_DIRECTORY
         self.art_style_json = directory / "art-style.json"
+        self.expression_json = directory / "expression.json"
+        self.pose_json = directory / "pose.json"
         self.scene_json = directory / "scene.json"
         self.shoot_json = directory / "shoot.json"
         self.comfy_ui_url = _text("COMFY_UI_URL").rstrip("/")

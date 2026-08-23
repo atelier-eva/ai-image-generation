@@ -19,7 +19,7 @@ class ShootRepository:
             expressions=ExpressionRepository().find(),
             poses=PoseRepository().find(),
             scene=self._scene(),
-            art_style=ArtStyleRepository().find(),
+            art_styles=ArtStyleRepository().find(),
             quality=QualityRepository().find(),
             rating=RatingRepository().find(),
         )

@@ -17,6 +17,6 @@ class Shoot:
     expressions: ExpressionSettings = field(default_factory=ExpressionSettings)
     poses: PoseSettings = field(default_factory=PoseSettings)
     scene: Scene | None = None
-    art_style: ArtStyle | None = None
+    art_styles: tuple[ArtStyle, ...] = ()
     quality: Quality | None = None
     rating: ContentRating | None = None
