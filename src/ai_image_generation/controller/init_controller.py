@@ -9,12 +9,12 @@ from ai_image_generation.config import Config
 _JSON_FILES = (
     "art-style.json",
     "camera.json",
-    "characters.json",
     "expression.json",
     "generation.json",
     "pose.json",
     "scene.json",
 )
+_CHARACTERS_DIRECTORY = "characters"
 
 
 class InitController:
@@ -46,6 +46,7 @@ class InitController:
         lora_training.mkdir(parents=True, exist_ok=True)
         for name in _JSON_FILES:
             self._write_json(lora_training / name, args.force)
+        self._write_characters(lora_training / _CHARACTERS_DIRECTORY, args.force)
         self._write_env(text)
         print(f"Input directory: {path}")
         print("Fill in the JSON tags, then run: ai-image-generation generate")
@@ -84,15 +85,48 @@ class InitController:
         )
         print(f"Created: {env_path.resolve()}")
 
+    def _write_characters(self, destination: Path, force: bool) -> None:
+        if destination.exists() and not destination.is_dir():
+            raise NotADirectoryError(f"Not a directory: {destination}")
+        existed = destination.exists()
+        destination.mkdir(parents=True, exist_ok=True)
+        source_dir = files("ai_image_generation.resources").joinpath(
+            Config.LORA_TRAINING_DIRECTORY,
+            destination.name,
+        )
+        names = tuple(
+            sorted(
+                item.name
+                for item in source_dir.iterdir()
+                if item.name.endswith(".json") and item.is_file()
+            )
+        )
+        if not names:
+            action = "Skipped existing" if existed else "Created"
+            print(f"{action}: {destination}")
+            return
+        for name in names:
+            self._write_resource(
+                (Config.LORA_TRAINING_DIRECTORY, destination.name, name),
+                destination / name,
+                force,
+            )
+
     def _write_json(self, destination: Path, force: bool) -> None:
+        self._write_resource(
+            (Config.LORA_TRAINING_DIRECTORY, destination.name),
+            destination,
+            force,
+        )
+
+    def _write_resource(
+        self, relative: tuple[str, ...], destination: Path, force: bool
+    ) -> None:
         existed = destination.exists()
         if existed and not force:
             print(f"Skipped existing: {destination}")
             return
-        source = files("ai_image_generation.resources").joinpath(
-            Config.LORA_TRAINING_DIRECTORY,
-            destination.name,
-        )
+        source = files("ai_image_generation.resources").joinpath(*relative)
         destination.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
         action = "Overwrote" if existed else "Created"
         print(f"{action}: {destination}")
