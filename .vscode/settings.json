@@ -23,6 +23,10 @@
       "url": "./src/ai_image_generation/resources/lora-training/expression.schema.json"
     },
     {
+      "fileMatch": ["**/generation.json"],
+      "url": "./src/ai_image_generation/resources/lora-training/generation.schema.json"
+    },
+    {
       "fileMatch": ["**/pose.json"],
       "url": "./src/ai_image_generation/resources/lora-training/pose.schema.json"
     },

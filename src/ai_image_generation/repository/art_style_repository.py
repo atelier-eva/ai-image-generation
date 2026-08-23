@@ -7,7 +7,7 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 class ArtStyleRepository:
     def find(self) -> tuple[ArtStyle, ...]:
-        art_style = read_json(Config().art_style_json).get("art_style") or {}
+        art_style = read_json(Config().art_style_json)
         return tuple(
             self._to_art_style(item) for item in art_style.get("patterns") or []
         )

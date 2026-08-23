@@ -12,6 +12,7 @@ from ai_image_generation.config import Config
 _SCHEMA_FILES = {
     "art-style.json": "art-style.schema.json",
     "expression.json": "expression.schema.json",
+    "generation.json": "generation.schema.json",
     "pose.json": "pose.schema.json",
     "scene.json": "scene.schema.json",
     "shoot.json": "shoot.schema.json",

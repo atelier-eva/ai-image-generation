@@ -7,7 +7,7 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 class RatingRepository:
     def find(self) -> ContentRating | None:
-        return self._to_rating(read_json(Config().art_style_json).get("rating"))
+        return self._to_rating(read_json(Config().generation_json).get("rating"))
 
     def _to_rating(self, data: Any) -> ContentRating | None:
         if not data:

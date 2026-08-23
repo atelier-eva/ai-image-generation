@@ -2,36 +2,20 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://local.spec/art-style.schema.json",
   "title": "Art style (art-style.json)",
-  "description": "Art style patterns, quality, and rating tags for generated prompts.",
+  "description": "Art style patterns for generated prompts.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "art_style": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "patterns": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/named_tag_set" },
-          "description": "One generated row per pattern, after pose. Empty or omitted emits one row without art style tags. positive is used in positive_prompt and caption_prompt; negative is used in negative_prompt only."
-        }
-      }
-    },
-    "quality": { "$ref": "#/$defs/tag_set" },
-    "rating": { "$ref": "#/$defs/tag_set" }
+    "patterns": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/named_tag_set" },
+      "description": "One generated row per pattern, after pose. Empty or omitted emits one row without art style tags. positive is used in positive_prompt and caption_prompt; negative is used in negative_prompt only."
+    }
   },
   "$defs": {
     "tags": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
-    },
-    "tag_set": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "positive": { "$ref": "#/$defs/tags" },
-        "negative": { "$ref": "#/$defs/tags" }
-      }
     },
     "named_tag_set": {
       "type": "object",
