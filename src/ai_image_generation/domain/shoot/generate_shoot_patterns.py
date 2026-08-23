@@ -5,6 +5,8 @@ from ai_image_generation.domain.art_style.art_style import ArtStyle
 from ai_image_generation.domain.camera.camera import Camera
 from ai_image_generation.domain.expression.expression import Expression
 from ai_image_generation.domain.pose.pose import Pose
+from ai_image_generation.domain.scene.background.scene_background import SceneBackground
+from ai_image_generation.domain.scene.lighting.scene_lighting import SceneLighting
 from ai_image_generation.domain.shoot.generate_shoot_patterns_output import (
     GenerateShootPatternsOutput,
 )
@@ -25,19 +27,23 @@ class GenerateShootPatterns:
                 for expression in self._expand_expressions(shoot, camera):
                     for pose in self._expand_poses(shoot, camera):
                         for art_style in self._expand_art_styles(shoot):
-                            row_number += 1
-                            patterns.append(
-                                self._to_output(
-                                    shoot,
-                                    camera,
-                                    subject,
-                                    expression,
-                                    pose,
-                                    art_style,
-                                    row_number,
-                                    filename_prefix,
-                                )
-                            )
+                            for background in self._expand_backgrounds(shoot):
+                                for lighting in self._expand_lightings(shoot):
+                                    row_number += 1
+                                    patterns.append(
+                                        self._to_output(
+                                            shoot,
+                                            camera,
+                                            subject,
+                                            expression,
+                                            pose,
+                                            art_style,
+                                            background,
+                                            lighting,
+                                            row_number,
+                                            filename_prefix,
+                                        )
+                                    )
         return tuple(patterns)
 
     def _caption_prompt(
@@ -47,6 +53,8 @@ class GenerateShootPatterns:
         expression: Expression | None,
         pose: Pose | None,
         art_style: ArtStyle | None,
+        background: SceneBackground | None,
+        lighting: SceneLighting | None,
     ) -> str:
         caption = self._join(
             (subject.name,),
@@ -57,6 +65,8 @@ class GenerateShootPatterns:
             expression.positive_features if expression else (),
             pose.positive_features if pose else (),
             art_style.positive_features if art_style else (),
+            background.positive_features if background else (),
+            lighting.positive_features if lighting else (),
         )
         if not caption:
             raise ValueError(
@@ -70,11 +80,23 @@ class GenerateShootPatterns:
             return shoot.art_styles
         return (None,)
 
+    def _expand_backgrounds(
+        self, shoot: Shoot
+    ) -> tuple[SceneBackground | None, ...]:
+        if shoot.backgrounds:
+            return shoot.backgrounds
+        return (None,)
+
     def _expand_expressions(
         self, shoot: Shoot, camera: Camera
     ) -> tuple[Expression | None, ...]:
         if shoot.expressions.includes(camera):
             return shoot.expressions.patterns
+        return (None,)
+
+    def _expand_lightings(self, shoot: Shoot) -> tuple[SceneLighting | None, ...]:
+        if shoot.lightings:
+            return shoot.lightings
         return (None,)
 
     def _expand_poses(self, shoot: Shoot, camera: Camera) -> tuple[Pose | None, ...]:
@@ -98,6 +120,8 @@ class GenerateShootPatterns:
         expression: Expression | None,
         pose: Pose | None,
         art_style: ArtStyle | None,
+        background: SceneBackground | None,
+        lighting: SceneLighting | None,
         prefix: str,
     ) -> str:
         parts = [
@@ -112,6 +136,10 @@ class GenerateShootPatterns:
             parts.append(self._slug(pose.name))
         if art_style is not None:
             parts.append(self._slug(art_style.name))
+        if background is not None:
+            parts.append(self._slug(background.name))
+        if lighting is not None:
+            parts.append(self._slug(lighting.name))
         return "_".join(parts)
 
     def _join(self, *groups: tuple[str, ...]) -> str:
@@ -125,12 +153,15 @@ class GenerateShootPatterns:
         expression: Expression | None,
         pose: Pose | None,
         art_style: ArtStyle | None,
+        background: SceneBackground | None,
+        lighting: SceneLighting | None,
     ) -> str:
         return self._join(
             shoot.rating.negative_features if shoot.rating else (),
             art_style.negative_features if art_style else (),
             shoot.quality.negative_features if shoot.quality else (),
-            shoot.scene.negative_features if shoot.scene else (),
+            background.negative_features if background else (),
+            lighting.negative_features if lighting else (),
             self._feature_names(subject.negative_features(camera)),
             camera.angle.negative_features,
             camera.distance.negative_features,
@@ -146,6 +177,8 @@ class GenerateShootPatterns:
         expression: Expression | None,
         pose: Pose | None,
         art_style: ArtStyle | None,
+        background: SceneBackground | None,
+        lighting: SceneLighting | None,
     ) -> str:
         return self._join(
             subject.kinds,
@@ -156,7 +189,8 @@ class GenerateShootPatterns:
             camera.distance.positive_features,
             expression.positive_features if expression else (),
             pose.positive_features if pose else (),
-            shoot.scene.positive_features if shoot.scene else (),
+            background.positive_features if background else (),
+            lighting.positive_features if lighting else (),
             shoot.quality.positive_features if shoot.quality else (),
         )
 
@@ -171,23 +205,47 @@ class GenerateShootPatterns:
         expression: Expression | None,
         pose: Pose | None,
         art_style: ArtStyle | None,
+        background: SceneBackground | None,
+        lighting: SceneLighting | None,
         row_number: int,
         prefix: str,
     ) -> GenerateShootPatternsOutput:
         return GenerateShootPatternsOutput(
             filename_prefix=self._filename_prefix(
-                row_number, camera, subject, expression, pose, art_style, prefix
+                row_number,
+                camera,
+                subject,
+                expression,
+                pose,
+                art_style,
+                background,
+                lighting,
+                prefix,
             ),
             width=camera.frame.width,
             height=camera.frame.height,
             positive_prompt=self._positive_prompt(
-                shoot, camera, subject, expression, pose, art_style
+                shoot,
+                camera,
+                subject,
+                expression,
+                pose,
+                art_style,
+                background,
+                lighting,
             ),
             negative_prompt=self._negative_prompt(
-                shoot, camera, subject, expression, pose, art_style
+                shoot,
+                camera,
+                subject,
+                expression,
+                pose,
+                art_style,
+                background,
+                lighting,
             ),
             caption_prompt=self._caption_prompt(
-                camera, subject, expression, pose, art_style
+                camera, subject, expression, pose, art_style, background, lighting
             ),
         )
 

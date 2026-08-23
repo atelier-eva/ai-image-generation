@@ -27,12 +27,12 @@
         "angle": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
-          "description": "camera.angle[].name values in shoot.json"
+          "description": "camera.angle[].name values in camera.json"
         },
         "distance": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
-          "description": "camera.distance[].name values in shoot.json"
+          "description": "camera.distance[].name values in camera.json"
         }
       }
     },

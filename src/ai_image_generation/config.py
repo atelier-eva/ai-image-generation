@@ -10,11 +10,12 @@ class Config:
     def __init__(self) -> None:
         directory = _directory("INPUT_DIRECTORY") / self.LORA_TRAINING_DIRECTORY
         self.art_style_json = directory / "art-style.json"
+        self.camera_json = directory / "camera.json"
+        self.characters_json = directory / "characters.json"
         self.expression_json = directory / "expression.json"
         self.generation_json = directory / "generation.json"
         self.pose_json = directory / "pose.json"
         self.scene_json = directory / "scene.json"
-        self.shoot_json = directory / "shoot.json"
         self.comfy_ui_url = _text("COMFY_UI_URL").rstrip("/")
         self.comfy_ui_ckpt_name = _text("COMFY_UI_CKPT_NAME")
         self.comfy_ui_filename_prefix = _text("COMFY_UI_FILENAME_PREFIX")

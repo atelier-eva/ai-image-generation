@@ -13,7 +13,7 @@ class SubjectRepository:
     def find(self) -> tuple[Subject, ...]:
         return tuple(
             self._to_subject(item)
-            for item in read_json(Config().shoot_json).get("characters") or []
+            for item in read_json(Config().characters_json).get("characters") or []
         )
 
     def _to_subject(self, data: dict[str, Any]) -> Subject:

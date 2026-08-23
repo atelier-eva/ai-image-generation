@@ -1,48 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://local.spec/shoot.schema.json",
-  "title": "Shoot (shoot.json)",
-  "description": "Prompt tag definitions for camera and character combinations.",
+  "$id": "https://local.spec/characters.schema.json",
+  "title": "Characters (characters.json)",
+  "description": "Character tag definitions for generated prompts.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "camera": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "angle": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/named_tag_set" }
-        },
-        "distance": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["name", "image_size"],
-            "properties": {
-              "name": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Stable identifier; used in filename_prefix. When positive is omitted or empty, name is the sole positive tag."
-              },
-              "positive": { "$ref": "#/$defs/tags" },
-              "negative": { "$ref": "#/$defs/tags" },
-              "image_size": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": ["width", "height"],
-                "properties": {
-                  "width": { "type": "integer" },
-                  "height": { "type": "integer" }
-                },
-                "description": "Output dimensions for this camera distance (width x height)"
-              }
-            }
-          }
-        }
-      }
-    },
     "characters": {
       "type": "array",
       "items": {
@@ -107,27 +70,13 @@
         "angle": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
-          "description": "camera.angle[].name values"
+          "description": "camera.angle[].name values in camera.json"
         },
         "distance": {
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
-          "description": "camera.distance[].name values"
+          "description": "camera.distance[].name values in camera.json"
         }
-      }
-    },
-    "named_tag_set": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["name"],
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Stable identifier; used in filename_prefix. When positive is omitted or empty, name is the sole positive tag."
-        },
-        "positive": { "$ref": "#/$defs/tags" },
-        "negative": { "$ref": "#/$defs/tags" }
       }
     }
   }
