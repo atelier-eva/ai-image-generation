@@ -5,13 +5,15 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from ai_image_generation.config import Config
-from ai_image_generation.repository.json_io import read_json
+from ai_image_generation.repository.json_io import read_resource_json
 
-LORA_TRAINING_IMAGE_CREATION_API_JSON = Path("art/lora-training-image-creation-api.json")
+_LORA_TRAINING_IMAGE_GENERATION_API_JSON = (
+    "comfyui",
+    "lora-training-image-generation-api.json",
+)
 
 
 class ComfyUi:
@@ -26,8 +28,9 @@ class ComfyUi:
     def __init__(self) -> None:
         config = Config()
         self._url = config.comfy_ui_url
+        self._ckpt_name = config.comfy_ui_ckpt_name
         self._output_directory = config.output_directory
-        self._template = read_json(LORA_TRAINING_IMAGE_CREATION_API_JSON)
+        self._template = read_resource_json(*_LORA_TRAINING_IMAGE_GENERATION_API_JSON)
 
     def generate_images(
         self,
@@ -189,6 +192,7 @@ class ComfyUi:
         batch_size: int,
     ) -> dict[str, Any]:
         workflow = copy.deepcopy(self._template)
+        workflow["2"]["inputs"]["ckpt_name"] = self._ckpt_name
         workflow["3"]["inputs"]["text"] = positive_prompt
         workflow["4"]["inputs"]["text"] = negative_prompt
         workflow["8"]["inputs"]["width"] = width

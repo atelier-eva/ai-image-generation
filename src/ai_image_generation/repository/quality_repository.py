@@ -7,7 +7,7 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 class QualityRepository:
     def find(self) -> Quality:
-        return self._to_quality(read_json(Config().art_style_json).get("quality"))
+        return self._to_quality(read_json(Config().generation_json).get("quality"))
 
     def _to_quality(self, data: Any) -> Quality:
         if not data:

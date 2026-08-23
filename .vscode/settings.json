@@ -19,8 +19,24 @@
       "url": "./src/ai_image_generation/resources/lora-training/art-style.schema.json"
     },
     {
-      "fileMatch": ["**/shoot.json"],
-      "url": "./src/ai_image_generation/resources/lora-training/shoot.schema.json"
+      "fileMatch": ["**/camera.json"],
+      "url": "./src/ai_image_generation/resources/lora-training/camera.schema.json"
+    },
+    {
+      "fileMatch": ["**/characters.json"],
+      "url": "./src/ai_image_generation/resources/lora-training/characters.schema.json"
+    },
+    {
+      "fileMatch": ["**/expression.json"],
+      "url": "./src/ai_image_generation/resources/lora-training/expression.schema.json"
+    },
+    {
+      "fileMatch": ["**/generation.json"],
+      "url": "./src/ai_image_generation/resources/lora-training/generation.schema.json"
+    },
+    {
+      "fileMatch": ["**/pose.json"],
+      "url": "./src/ai_image_generation/resources/lora-training/pose.schema.json"
     },
     {
       "fileMatch": ["**/scene.json"],

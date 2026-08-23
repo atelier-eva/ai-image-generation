@@ -5,30 +5,37 @@ from ai_image_generation.domain.scene.background.scene_background import (
     SceneBackground,
 )
 from ai_image_generation.domain.scene.lighting.scene_lighting import SceneLighting
-from ai_image_generation.domain.scene.scene import Scene
 from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 
 class SceneRepository:
-    def find(self) -> Scene:
+    def find(self) -> tuple[tuple[SceneBackground, ...], tuple[SceneLighting, ...]]:
         data = read_json(Config().scene_json)
-        return Scene(
-            background=self._to_background(data.get("background")),
-            lighting=self._to_lighting(data.get("lighting")),
+        background = data.get("background") or {}
+        lighting = data.get("lighting") or {}
+        return (
+            tuple(
+                self._to_background(item) for item in background.get("patterns") or []
+            ),
+            tuple(self._to_lighting(item) for item in lighting.get("patterns") or []),
         )
 
-    def _to_background(self, data: Any) -> SceneBackground | None:
-        if not data:
-            return None
+    def _to_background(self, data: dict[str, Any]) -> SceneBackground:
+        positive = to_string_tuple(data.get("positive"))
+        if not positive:
+            positive = (data["name"].strip(),)
         return SceneBackground(
-            positive_features=to_string_tuple(data.get("positive")),
+            name=data["name"].strip(),
+            positive_features=positive,
             negative_features=to_string_tuple(data.get("negative")),
         )
 
-    def _to_lighting(self, data: Any) -> SceneLighting | None:
-        if not data:
-            return None
+    def _to_lighting(self, data: dict[str, Any]) -> SceneLighting:
+        positive = to_string_tuple(data.get("positive"))
+        if not positive:
+            positive = (data["name"].strip(),)
         return SceneLighting(
-            positive_features=to_string_tuple(data.get("positive")),
+            name=data["name"].strip(),
+            positive_features=positive,
             negative_features=to_string_tuple(data.get("negative")),
         )

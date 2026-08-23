@@ -6,13 +6,18 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 
 class ArtStyleRepository:
-    def find(self) -> ArtStyle:
-        return self._to_art_style(read_json(Config().art_style_json).get("art_style"))
+    def find(self) -> tuple[ArtStyle, ...]:
+        art_style = read_json(Config().art_style_json)
+        return tuple(
+            self._to_art_style(item) for item in art_style.get("patterns") or []
+        )
 
-    def _to_art_style(self, data: Any) -> ArtStyle:
-        if not data:
-            return ArtStyle()
+    def _to_art_style(self, data: dict[str, Any]) -> ArtStyle:
+        positive = to_string_tuple(data.get("positive"))
+        if not positive:
+            positive = (data["name"].strip(),)
         return ArtStyle(
-            positive_features=to_string_tuple(data.get("positive")),
+            name=data["name"].strip(),
+            positive_features=positive,
             negative_features=to_string_tuple(data.get("negative")),
         )

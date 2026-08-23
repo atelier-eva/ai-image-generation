@@ -8,7 +8,7 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 class PoseRepository:
     def find(self) -> PoseSettings:
-        pose = read_json(Config().shoot_json).get("pose") or {}
+        pose = read_json(Config().pose_json)
         skip = pose.get("skip_camera") or {}
         return PoseSettings(
             patterns=tuple(self._to_pose(item) for item in pose.get("patterns") or []),

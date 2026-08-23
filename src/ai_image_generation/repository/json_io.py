@@ -11,14 +11,21 @@ from ai_image_generation.config import Config
 
 _SCHEMA_FILES = {
     "art-style.json": "art-style.schema.json",
+    "camera.json": "camera.schema.json",
+    "characters.json": "characters.schema.json",
+    "expression.json": "expression.schema.json",
+    "generation.json": "generation.schema.json",
+    "pose.json": "pose.schema.json",
     "scene.json": "scene.schema.json",
-    "shoot.json": "shoot.schema.json",
 }
 
 
 def read_json(path: Path) -> dict[str, Any]:
     return _read_json(path.expanduser().resolve())
 
+
+def read_resource_json(*relative: str) -> dict[str, Any]:
+    return _read_resource_json(relative)
 
 @cache
 def _read_json(path: Path) -> dict[str, Any]:
@@ -33,6 +40,15 @@ def _read_json(path: Path) -> dict[str, Any]:
     error = best_match(validator.iter_errors(loaded))
     if error is not None:
         raise ValueError(_format_validation_error(path, error)) from error
+    return loaded
+
+
+@cache
+def _read_resource_json(relative: tuple[str, ...]) -> dict[str, Any]:
+    resource = files("ai_image_generation.resources").joinpath(*relative)
+    loaded = json.loads(resource.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict):
+        raise ValueError(f"JSON must be an object: {resource}")
     return loaded
 
 

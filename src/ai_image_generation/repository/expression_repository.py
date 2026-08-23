@@ -8,7 +8,7 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 class ExpressionRepository:
     def find(self) -> ExpressionSettings:
-        expression = read_json(Config().shoot_json).get("expression") or {}
+        expression = read_json(Config().expression_json)
         skip = expression.get("skip_camera") or {}
         return ExpressionSettings(
             patterns=tuple(
