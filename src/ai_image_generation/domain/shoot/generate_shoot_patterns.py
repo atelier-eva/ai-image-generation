@@ -211,6 +211,14 @@ class GenerateShootPatterns:
         prefix: str,
     ) -> GenerateShootPatternsOutput:
         return GenerateShootPatternsOutput(
+            subject_name=subject.name,
+            angle_name=camera.angle.name,
+            distance_name=camera.distance.name,
+            expression_name=expression.name if expression else None,
+            pose_name=pose.name if pose else None,
+            art_style_name=art_style.name if art_style else None,
+            background_name=background.name if background else None,
+            lighting_name=lighting.name if lighting else None,
             filename_prefix=self._filename_prefix(
                 row_number,
                 camera,

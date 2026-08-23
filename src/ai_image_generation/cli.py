@@ -11,6 +11,9 @@ from ai_image_generation.controller.generate_lora_training_images_controller imp
     GenerateLoraTrainingImagesController,
 )
 from ai_image_generation.controller.init_controller import InitController
+from ai_image_generation.controller.report_lora_training_patterns_controller import (
+    ReportLoraTrainingPatternsController,
+)
 
 
 def main() -> None:
@@ -22,6 +25,9 @@ def main() -> None:
         return
     if command == "generate":
         GenerateLoraTrainingImagesController().execute(_command_parser("generate"))
+        return
+    if command == "report":
+        ReportLoraTrainingPatternsController().execute(_command_parser("report"))
         return
     _parser().parse_args(arguments)
 
@@ -45,5 +51,9 @@ def _parser() -> ArgumentParser:
     subparsers.add_parser(
         "init",
         help="Create input JSON templates in INPUT_DIRECTORY.",
+    )
+    subparsers.add_parser(
+        "report",
+        help="Write LoRA training pattern rows to CSV.",
     )
     return parser
