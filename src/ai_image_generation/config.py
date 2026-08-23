@@ -11,7 +11,7 @@ class Config:
         directory = _directory("INPUT_DIRECTORY") / self.LORA_TRAINING_DIRECTORY
         self.art_style_json = directory / "art-style.json"
         self.camera_json = directory / "camera.json"
-        self.characters_json = directory / "characters.json"
+        self.characters_directory = directory / "characters"
         self.expression_json = directory / "expression.json"
         self.generation_json = directory / "generation.json"
         self.pose_json = directory / "pose.json"

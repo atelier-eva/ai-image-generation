@@ -23,7 +23,7 @@
       "url": "./src/ai_image_generation/resources/lora-training/camera.schema.json"
     },
     {
-      "fileMatch": ["**/characters.json"],
+      "fileMatch": ["**/characters/*.json"],
       "url": "./src/ai_image_generation/resources/lora-training/characters.schema.json"
     },
     {
