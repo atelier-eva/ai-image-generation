@@ -1,5 +1,6 @@
 import re
 
+from ai_image_generation.config import Config
 from ai_image_generation.domain.camera.camera import Camera
 from ai_image_generation.domain.expression.expression import Expression
 from ai_image_generation.domain.pose.pose import Pose
@@ -15,6 +16,7 @@ from ai_image_generation.repository.shoot_repository import ShootRepository
 class GenerateShootPatterns:
     def execute(self) -> tuple[GenerateShootPatternsOutput, ...]:
         shoot = ShootRepository().find()
+        filename_prefix = Config().comfy_ui_filename_prefix
         patterns: list[GenerateShootPatternsOutput] = []
         row_number = 0
         for subject in shoot.subjects:
@@ -30,6 +32,7 @@ class GenerateShootPatterns:
                                 expression,
                                 pose,
                                 row_number,
+                                filename_prefix,
                             )
                         )
         return tuple(patterns)
@@ -83,9 +86,10 @@ class GenerateShootPatterns:
         subject: Subject,
         expression: Expression | None,
         pose: Pose | None,
+        prefix: str,
     ) -> str:
         parts = [
-            f"DS_LORA_{row_number:03d}",
+            f"{self._slug(prefix)}_{row_number:03d}",
             subject.name,
             self._slug(camera.angle.name),
             self._slug(camera.distance.name),
@@ -151,10 +155,11 @@ class GenerateShootPatterns:
         expression: Expression | None,
         pose: Pose | None,
         row_number: int,
+        prefix: str,
     ) -> GenerateShootPatternsOutput:
         return GenerateShootPatternsOutput(
             filename_prefix=self._filename_prefix(
-                row_number, camera, subject, expression, pose
+                row_number, camera, subject, expression, pose, prefix
             ),
             width=camera.frame.width,
             height=camera.frame.height,

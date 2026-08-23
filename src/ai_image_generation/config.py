@@ -13,6 +13,8 @@ class Config:
         self.scene_json = directory / "scene.json"
         self.shoot_json = directory / "shoot.json"
         self.comfy_ui_url = _text("COMFY_UI_URL").rstrip("/")
+        self.comfy_ui_ckpt_name = _text("COMFY_UI_CKPT_NAME")
+        self.comfy_ui_filename_prefix = _text("COMFY_UI_FILENAME_PREFIX")
         output_directory = _optional_directory("OUTPUT_DIRECTORY")
         if output_directory is None:
             output_directory = Path(self.DEFAULT_OUTPUT_DIRECTORY).expanduser().resolve()

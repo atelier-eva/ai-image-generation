@@ -20,6 +20,9 @@ def read_json(path: Path) -> dict[str, Any]:
     return _read_json(path.expanduser().resolve())
 
 
+def read_resource_json(*relative: str) -> dict[str, Any]:
+    return _read_resource_json(relative)
+
 @cache
 def _read_json(path: Path) -> dict[str, Any]:
     if not path.is_file():
@@ -33,6 +36,15 @@ def _read_json(path: Path) -> dict[str, Any]:
     error = best_match(validator.iter_errors(loaded))
     if error is not None:
         raise ValueError(_format_validation_error(path, error)) from error
+    return loaded
+
+
+@cache
+def _read_resource_json(relative: tuple[str, ...]) -> dict[str, Any]:
+    resource = files("ai_image_generation.resources").joinpath(*relative)
+    loaded = json.loads(resource.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict):
+        raise ValueError(f"JSON must be an object: {resource}")
     return loaded
 
 
