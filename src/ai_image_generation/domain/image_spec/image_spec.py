@@ -10,6 +10,6 @@ class ImageSpec:
     width: int
     height: int
     prompt: Prompt
-    strength_model: float = 1.0
-    strength_clip: float = 1.0
+    model_strength: float = 1.0
+    text_encoder_strength: float = 1.0
     pose_image: str | None = None
