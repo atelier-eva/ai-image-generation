@@ -6,7 +6,7 @@ from ai_image_generation.domain.image_spec.generate_image_spec_output import (
 from ai_image_generation.domain.image_spec.image_spec import ImageSpec
 
 
-class GenerateImageSpecOutputs:
+class GenerateImageSpec:
     def execute(
         self,
         specs: tuple[ImageSpec, ...],
