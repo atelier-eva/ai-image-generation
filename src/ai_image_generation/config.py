@@ -6,9 +6,11 @@ class Config:
     DEFAULT_INPUT_DIRECTORY = "ai-image-generation"
     DEFAULT_OUTPUT_DIRECTORY = "output"
     LORA_TRAINING_DIRECTORY = "lora-training"
+    PROMPT_DIRECTORY = "prompt"
 
     def __init__(self) -> None:
-        directory = _directory("INPUT_DIRECTORY") / self.LORA_TRAINING_DIRECTORY
+        input_directory = _directory("INPUT_DIRECTORY")
+        directory = input_directory / self.LORA_TRAINING_DIRECTORY
         self.art_style_json = directory / "art-style.json"
         self.camera_json = directory / "camera.json"
         self.characters_directory = directory / "characters"
@@ -16,6 +18,7 @@ class Config:
         self.generation_json = directory / "generation.json"
         self.pose_json = directory / "pose.json"
         self.scene_json = directory / "scene.json"
+        self.prompt_directory = input_directory / self.PROMPT_DIRECTORY
         self.comfy_ui_url = _text("COMFY_UI_URL").rstrip("/")
         self.comfy_ui_ckpt_name = _text("COMFY_UI_CKPT_NAME")
         self.comfy_ui_filename_prefix = _text("COMFY_UI_FILENAME_PREFIX")
