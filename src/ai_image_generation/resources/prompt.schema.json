@@ -12,64 +12,6 @@
       "minLength": 1,
       "description": "Stable identifier; used in filename_prefix."
     },
-    "lora": { "$ref": "#/$defs/lora" },
-    "pose": { "$ref": "#/$defs/pose" },
-    "image_size": { "$ref": "#/$defs/image_size" },
-    "positive": {
-      "$ref": "#/$defs/tags",
-      "description": "Positive prompt tags, joined for ComfyUI. Trigger words belong here. Empty emits no positive tags."
-    },
-    "negative": {
-      "$ref": "#/$defs/tags",
-      "description": "Negative prompt tags, joined for ComfyUI. Empty emits no negative tags."
-    }
-  },
-  "examples": [
-    {
-      "name": "sunset-city",
-      "lora": {
-        "name": "dsh1.safetensors",
-        "strength_model": 1,
-        "strength_clip": 1
-      },
-      "pose": {
-        "image": "poses/standing.png"
-      },
-      "image_size": {
-        "width": 1024,
-        "height": 1536
-      },
-      "positive": ["1girl", "sunset", "cityscape"],
-      "negative": ["worst quality"]
-    },
-    {
-      "name": "sunset-city-no-pose",
-      "lora": {
-        "name": "dsh1.safetensors"
-      },
-      "image_size": {
-        "width": 1024,
-        "height": 1536
-      },
-      "positive": ["1girl", "sunset", "cityscape"],
-      "negative": []
-    }
-  ],
-  "$defs": {
-    "tags": {
-      "type": "array",
-      "items": { "type": "string", "minLength": 1 }
-    },
-    "image_size": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["width", "height"],
-      "properties": {
-        "width": { "type": "integer", "minimum": 1 },
-        "height": { "type": "integer", "minimum": 1 }
-      },
-      "description": "Output dimensions (width x height)."
-    },
     "lora": {
       "type": "object",
       "additionalProperties": false,
@@ -103,6 +45,30 @@
           "description": "Path relative to the prompt/ directory (e.g. poses/standing.png). Uploaded to ComfyUI for LoadImage."
         }
       }
+    },
+    "image_size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      },
+      "description": "Output dimensions (width x height)."
+    },
+    "positive": {
+      "$ref": "#/$defs/tags",
+      "description": "Positive prompt tags, joined for ComfyUI. Trigger words belong here. Empty emits no positive tags."
+    },
+    "negative": {
+      "$ref": "#/$defs/tags",
+      "description": "Negative prompt tags, joined for ComfyUI. Empty emits no negative tags."
+    }
+  },
+  "$defs": {
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
     }
   }
 }
