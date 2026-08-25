@@ -8,7 +8,7 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 
 class ImageSpecRepository:
-    def find(self) -> tuple[ImageSpec, ...]:
+    def get(self) -> tuple[ImageSpec, ...]
         specs: list[ImageSpec] = []
         names: dict[str, Path] = {}
         for path in self._json_paths():
