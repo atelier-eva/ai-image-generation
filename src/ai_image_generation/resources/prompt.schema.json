@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.spec/prompt.schema.json",
+  "title": "Prompt (prompt/*.json)",
+  "description": "One prompt per JSON file under prompt/. Specified-prompt image generation; not cartesian LoRA training rows.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "lora", "image_size", "positive", "negative"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier; used in filename_prefix."
+    },
+    "lora": { "$ref": "#/$defs/lora" },
+    "pose": { "$ref": "#/$defs/pose" },
+    "image_size": { "$ref": "#/$defs/image_size" },
+    "positive": {
+      "$ref": "#/$defs/tags",
+      "description": "Positive prompt tags, joined for ComfyUI. Trigger words belong here. Empty emits no positive tags."
+    },
+    "negative": {
+      "$ref": "#/$defs/tags",
+      "description": "Negative prompt tags, joined for ComfyUI. Empty emits no negative tags."
+    }
+  },
+  "examples": [
+    {
+      "name": "sunset-city",
+      "lora": {
+        "name": "dsh1.safetensors",
+        "strength_model": 1,
+        "strength_clip": 1
+      },
+      "pose": {
+        "image": "poses/standing.png"
+      },
+      "image_size": {
+        "width": 1024,
+        "height": 1536
+      },
+      "positive": ["1girl", "sunset", "cityscape"],
+      "negative": ["worst quality"]
+    },
+    {
+      "name": "sunset-city-no-pose",
+      "lora": {
+        "name": "dsh1.safetensors"
+      },
+      "image_size": {
+        "width": 1024,
+        "height": 1536
+      },
+      "positive": ["1girl", "sunset", "cityscape"],
+      "negative": []
+    }
+  ],
+  "$defs": {
+    "tags": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "image_size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      },
+      "description": "Output dimensions (width x height)."
+    },
+    "lora": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "description": "LoRA applied via ComfyUI LoraLoader. One per prompt.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Filename under ComfyUI models/loras, including optional subfolders (e.g. style/foo.safetensors)."
+        },
+        "strength_model": {
+          "type": "number",
+          "description": "ComfyUI LoraLoader strength_model. When omitted, 1 is used."
+        },
+        "strength_clip": {
+          "type": "number",
+          "description": "ComfyUI LoraLoader strength_clip. When omitted, 1 is used."
+        }
+      }
+    },
+    "pose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image"],
+      "description": "Optional pose image. Omit pose entirely to drop LoadImage/ControlNet from the submitted graph.",
+      "properties": {
+        "image": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Path relative to the prompt/ directory (e.g. poses/standing.png). Uploaded to ComfyUI for LoadImage."
+        }
+      }
+    }
+  }
+}

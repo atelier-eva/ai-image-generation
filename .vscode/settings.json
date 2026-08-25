@@ -39,6 +39,10 @@
       "url": "./src/ai_image_generation/resources/lora-training/pose.schema.json"
     },
     {
+      "fileMatch": ["**/prompt/*.json"],
+      "url": "./src/ai_image_generation/resources/prompt.schema.json"
+    },
+    {
       "fileMatch": ["**/scene.json"],
       "url": "./src/ai_image_generation/resources/lora-training/scene.schema.json"
     }
