@@ -11,7 +11,6 @@ class GenerateShootPatternsOutput:
     art_style_name: str | None
     background_name: str | None
     lighting_name: str | None
-    filename_prefix: str
     width: int
     height: int
     positive_prompt: str

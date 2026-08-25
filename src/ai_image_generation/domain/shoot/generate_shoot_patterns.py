@@ -1,6 +1,3 @@
-import re
-
-from ai_image_generation.config import Config
 from ai_image_generation.domain.art_style.art_style import ArtStyle
 from ai_image_generation.domain.camera.camera import Camera
 from ai_image_generation.domain.expression.expression import Expression
@@ -19,9 +16,7 @@ from ai_image_generation.repository.shoot_repository import ShootRepository
 class GenerateShootPatterns:
     def execute(self) -> tuple[GenerateShootPatternsOutput, ...]:
         shoot = ShootRepository().find()
-        filename_prefix = Config().comfy_ui_filename_prefix
         patterns: list[GenerateShootPatternsOutput] = []
-        row_number = 0
         for subject in shoot.subjects:
             for camera in shoot.cameras:
                 for expression in self._expand_expressions(shoot, camera):
@@ -29,7 +24,6 @@ class GenerateShootPatterns:
                         for art_style in self._expand_art_styles(shoot):
                             for background in self._expand_backgrounds(shoot):
                                 for lighting in self._expand_lightings(shoot):
-                                    row_number += 1
                                     patterns.append(
                                         self._to_output(
                                             shoot,
@@ -40,8 +34,6 @@ class GenerateShootPatterns:
                                             art_style,
                                             background,
                                             lighting,
-                                            row_number,
-                                            filename_prefix,
                                         )
                                     )
         return tuple(patterns)
@@ -112,36 +104,6 @@ class GenerateShootPatterns:
             for feature in features
         )
 
-    def _filename_prefix(
-        self,
-        row_number: int,
-        camera: Camera,
-        subject: Subject,
-        expression: Expression | None,
-        pose: Pose | None,
-        art_style: ArtStyle | None,
-        background: SceneBackground | None,
-        lighting: SceneLighting | None,
-        prefix: str,
-    ) -> str:
-        parts = [
-            f"{self._slug(prefix)}_{row_number:03d}",
-            subject.name,
-            self._slug(camera.angle.name),
-            self._slug(camera.distance.name),
-        ]
-        if expression is not None:
-            parts.append(self._slug(expression.name))
-        if pose is not None:
-            parts.append(self._slug(pose.name))
-        if art_style is not None:
-            parts.append(self._slug(art_style.name))
-        if background is not None:
-            parts.append(self._slug(background.name))
-        if lighting is not None:
-            parts.append(self._slug(lighting.name))
-        return "_".join(parts)
-
     def _join(self, *groups: tuple[str, ...]) -> str:
         return ", ".join(name for group in groups for name in group if name)
 
@@ -194,9 +156,6 @@ class GenerateShootPatterns:
             shoot.quality.positive_features if shoot.quality else (),
         )
 
-    def _slug(self, name: str) -> str:
-        return re.sub(r"\s+", "-", name.strip().lower())
-
     def _to_output(
         self,
         shoot: Shoot,
@@ -207,8 +166,6 @@ class GenerateShootPatterns:
         art_style: ArtStyle | None,
         background: SceneBackground | None,
         lighting: SceneLighting | None,
-        row_number: int,
-        prefix: str,
     ) -> GenerateShootPatternsOutput:
         return GenerateShootPatternsOutput(
             subject_name=subject.name,
@@ -219,17 +176,6 @@ class GenerateShootPatterns:
             art_style_name=art_style.name if art_style else None,
             background_name=background.name if background else None,
             lighting_name=lighting.name if lighting else None,
-            filename_prefix=self._filename_prefix(
-                row_number,
-                camera,
-                subject,
-                expression,
-                pose,
-                art_style,
-                background,
-                lighting,
-                prefix,
-            ),
             width=camera.frame.width,
             height=camera.frame.height,
             positive_prompt=self._positive_prompt(
