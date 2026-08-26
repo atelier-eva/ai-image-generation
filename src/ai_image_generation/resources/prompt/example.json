@@ -1,11 +1,10 @@
 {
-  "name": "",
   "lora": {
-    "id": ""
+    "id": "example.safetensors"
   },
   "image_size": {
-    "width": 0,
-    "height": 0
+    "width": 1024,
+    "height": 1024
   },
   "positive": [],
   "negative": []

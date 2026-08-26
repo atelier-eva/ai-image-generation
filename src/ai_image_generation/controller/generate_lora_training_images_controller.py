@@ -39,7 +39,7 @@ class GenerateLoraTrainingImagesController:
             filename_prefix = self._filename_prefix(pattern, index + 1, prefix)
             print(f"[{index + 1}/{end}] {filename_prefix}")
             seed = args.base_seed + index * args.batch_size
-            images = comfy_ui.generate_images(
+            images = comfy_ui.generate_lora_training_images(
                 filename_prefix,
                 pattern.width,
                 pattern.height,

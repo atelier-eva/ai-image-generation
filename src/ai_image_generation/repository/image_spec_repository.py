@@ -8,28 +8,23 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 
 class ImageSpecRepository:
-    def get(self) -> tuple[ImageSpec, ...]:
-        specs: list[ImageSpec] = []
-        names: dict[str, Path] = {}
-        for path in self._json_paths():
-            spec = self._to_image_spec(read_json(path))
-            previous = names.get(spec.name)
-            if previous is not None:
-                raise ValueError(
-                    f"Duplicate prompt name '{spec.name}': {previous} and {path}"
-                )
-            names[spec.name] = path
-            specs.append(spec)
-        return tuple(specs)
+    def get(self, ids: tuple[str, ...] = ()) -> tuple[ImageSpec, ...]:
+        paths = self._paths_for(ids) if ids else self._json_paths()
+        return tuple(self._to_image_spec(read_json(path), path.stem) for path in paths)
+
+    def _paths_for(self, ids: tuple[str, ...]) -> tuple[Path, ...]:
+        directory = self._prompt_directory()
+        paths: list[Path] = []
+        for identifier in ids:
+            self._validate_id(identifier)
+            path = directory / f"{identifier}.json"
+            if not path.is_file():
+                raise FileNotFoundError(f"Prompt JSON not found: {path.name}")
+            paths.append(path)
+        return tuple(paths)
 
     def _json_paths(self) -> tuple[Path, ...]:
-        directory = Config().prompt_directory
-        if not directory.exists():
-            raise FileNotFoundError(f"Prompt directory not found: {directory}")
-        if not directory.is_dir():
-            raise NotADirectoryError(
-                f"Prompt directory is not a directory: {directory}"
-            )
+        directory = self._prompt_directory()
         paths = tuple(
             sorted(path for path in directory.glob("*.json") if path.is_file())
         )
@@ -37,11 +32,25 @@ class ImageSpecRepository:
             raise FileNotFoundError(f"No prompt JSON in {directory}")
         return paths
 
-    def _to_image_spec(self, data: dict[str, Any]) -> ImageSpec:
+    def _prompt_directory(self) -> Path:
+        directory = Config().prompt_directory
+        if not directory.exists():
+            raise FileNotFoundError(f"Prompt directory not found: {directory}")
+        if not directory.is_dir():
+            raise NotADirectoryError(
+                f"Prompt directory is not a directory: {directory}"
+            )
+        return directory
+
+    def _validate_id(self, identifier: str) -> None:
+        if not identifier or Path(identifier).name != identifier:
+            raise ValueError(f"Invalid prompt id: {identifier}")
+
+    def _to_image_spec(self, data: dict[str, Any], identifier: str) -> ImageSpec:
         lora = data["lora"]
         size = data["image_size"]
         return ImageSpec(
-            name=data["name"].strip(),
+            id=identifier,
             lora_id=lora["id"].strip(),
             width=size["width"],
             height=size["height"],

@@ -2,16 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://local.spec/prompt.schema.json",
   "title": "Prompt (prompt/*.json)",
-  "description": "One prompt per JSON file under prompt/. Specified-prompt image generation; not cartesian LoRA training rows.",
+  "description": "One prompt per JSON file under prompt/. The file stem is the spec id and filename_prefix suffix. Specified-prompt image generation; not cartesian LoRA training rows.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "lora", "image_size", "positive", "negative"],
+  "required": ["lora", "image_size", "positive", "negative"],
   "properties": {
-    "name": {
-      "type": "string",
-      "minLength": 1,
-      "description": "Stable identifier; used in filename_prefix."
-    },
     "lora": {
       "type": "object",
       "additionalProperties": false,

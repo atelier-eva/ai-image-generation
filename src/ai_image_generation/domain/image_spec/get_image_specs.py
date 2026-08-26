@@ -5,5 +5,5 @@ from ai_image_generation.repository.image_spec_repository import ImageSpecReposi
 
 
 class GetImageSpecs:
-    def execute(self) -> GetImageSpecsOutput:
-        return GetImageSpecsOutput(ImageSpecRepository().get())
+    def execute(self, ids: tuple[str, ...] = ()) -> GetImageSpecsOutput:
+        return GetImageSpecsOutput(ImageSpecRepository().get(ids))
