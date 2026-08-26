@@ -8,7 +8,7 @@ from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 
 class ImageSpecRepository:
-    def get(self) -> tuple[ImageSpec, ...]
+    def get(self) -> tuple[ImageSpec, ...]:
         specs: list[ImageSpec] = []
         names: dict[str, Path] = {}
         for path in self._json_paths():
@@ -42,7 +42,7 @@ class ImageSpecRepository:
         size = data["image_size"]
         return ImageSpec(
             name=data["name"].strip(),
-            lora_name=lora["name"].strip(),
+            lora_id=lora["id"].strip(),
             width=size["width"],
             height=size["height"],
             prompt=Prompt(
@@ -51,26 +51,17 @@ class ImageSpecRepository:
             ),
             model_strength=self._to_strength(lora.get("strength_model")),
             text_encoder_strength=self._to_strength(lora.get("strength_clip")),
-            pose_image=self._to_pose_image(data),
+            pose_id=self._to_pose_id(data),
         )
 
-    def _to_pose_image(self, data: dict[str, Any]) -> str | None:
+    def _to_pose_id(self, data: dict[str, Any]) -> str | None:
         pose = data.get("pose")
         if not pose:
             return None
-        relative = str(pose["image"]).strip()
-        if not relative:
-            raise ValueError("pose.image is empty or missing.")
-        directory = Config().prompt_directory
-        base = directory.resolve()
-        resolved = (directory / relative).resolve()
-        if not resolved.is_relative_to(base):
-            raise ValueError(
-                f"Pose image is outside the prompt directory: {relative}"
-            )
-        if not resolved.is_file():
-            raise FileNotFoundError(f"Pose image not found: {resolved}")
-        return relative
+        identifier = str(pose["id"]).strip()
+        if not identifier:
+            raise ValueError("pose.id is empty or missing.")
+        return identifier
 
     def _to_strength(self, value: Any, default: float = 1.0) -> float:
         if value is None:

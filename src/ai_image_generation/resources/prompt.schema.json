@@ -15,13 +15,13 @@
     "lora": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name"],
+      "required": ["id"],
       "description": "LoRA applied via ComfyUI LoraLoader. One per prompt.",
       "properties": {
-        "name": {
+        "id": {
           "type": "string",
           "minLength": 1,
-          "description": "Filename under ComfyUI models/loras, including optional subfolders (e.g. style/foo.safetensors)."
+          "description": "Filename on the ComfyUI server under models/loras, including optional subfolders (e.g. style/foo.safetensors)."
         },
         "strength_model": {
           "type": "number",
@@ -36,13 +36,13 @@
     "pose": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["image"],
-      "description": "Optional pose image. Omit pose entirely to drop LoadImage/ControlNet from the submitted graph.",
+      "required": ["id"],
+      "description": "Optional pose. Omit pose entirely when unused.",
       "properties": {
-        "image": {
+        "id": {
           "type": "string",
           "minLength": 1,
-          "description": "Path relative to the prompt/ directory (e.g. poses/standing.png). Uploaded to ComfyUI for LoadImage."
+          "description": "Filename on the ComfyUI server under input."
         }
       }
     },
