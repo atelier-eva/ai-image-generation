@@ -7,6 +7,9 @@ from sys import argv
 
 from dotenv import load_dotenv
 
+from ai_image_generation.controller.generate_images_controller import (
+    GenerateImagesController,
+)
 from ai_image_generation.controller.generate_lora_training_images_controller import (
     GenerateLoraTrainingImagesController,
 )
@@ -25,6 +28,9 @@ def main() -> None:
         return
     if command == "generate":
         GenerateLoraTrainingImagesController().execute(_command_parser("generate"))
+        return
+    if command == "generate-image":
+        GenerateImagesController().execute(_command_parser("generate-image"))
         return
     if command == "report":
         ReportLoraTrainingPatternsController().execute(_command_parser("report"))
@@ -47,6 +53,10 @@ def _parser() -> ArgumentParser:
     subparsers.add_parser(
         "generate",
         help="Generate LoRA training images.",
+    )
+    subparsers.add_parser(
+        "generate-image",
+        help="Generate images from prompt/*.json specs.",
     )
     subparsers.add_parser(
         "init",
