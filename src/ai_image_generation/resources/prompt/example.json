@@ -1,0 +1,12 @@
+{
+  "name": "example",
+  "lora": {
+    "id": "example"
+  },
+  "image_size": {
+    "width": 1024,
+    "height": 1024
+  },
+  "positive": [],
+  "negative": []
+}
