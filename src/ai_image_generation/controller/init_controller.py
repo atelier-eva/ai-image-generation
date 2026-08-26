@@ -24,6 +24,7 @@ class InitController:
             help=(
                 "Root directory for feature input folders. "
                 f"LoRA templates go in {Config.LORA_TRAINING_DIRECTORY}/. "
+                f"Prompt templates go in {Config.PROMPT_DIRECTORY}/. "
                 f"Defaults to INPUT_DIRECTORY or {Config.DEFAULT_INPUT_DIRECTORY}."
             ),
         )
@@ -47,9 +48,17 @@ class InitController:
         for name in _JSON_FILES:
             self._write_json(lora_training / name, args.force)
         self._write_characters(lora_training / _CHARACTERS_DIRECTORY, args.force)
+        self._write_directory(
+            (Config.PROMPT_DIRECTORY,),
+            path / Config.PROMPT_DIRECTORY,
+            args.force,
+        )
         self._write_env(text)
         print(f"Input directory: {path}")
-        print("Fill in the JSON tags, then run: ai-image-generation generate")
+        print(
+            "Fill in the JSON tags, then run: "
+            "ai-image-generation lora-training or image"
+        )
 
     def _with_input_directory(self, text: str, directory: str) -> str:
         lines: list[str] = []
@@ -86,14 +95,20 @@ class InitController:
         print(f"Created: {env_path.resolve()}")
 
     def _write_characters(self, destination: Path, force: bool) -> None:
+        self._write_directory(
+            (Config.LORA_TRAINING_DIRECTORY, destination.name),
+            destination,
+            force,
+        )
+
+    def _write_directory(
+        self, relative: tuple[str, ...], destination: Path, force: bool
+    ) -> None:
         if destination.exists() and not destination.is_dir():
             raise NotADirectoryError(f"Not a directory: {destination}")
         existed = destination.exists()
         destination.mkdir(parents=True, exist_ok=True)
-        source_dir = files("ai_image_generation.resources").joinpath(
-            Config.LORA_TRAINING_DIRECTORY,
-            destination.name,
-        )
+        source_dir = files("ai_image_generation.resources").joinpath(*relative)
         names = tuple(
             sorted(
                 item.name
@@ -106,11 +121,7 @@ class InitController:
             print(f"{action}: {destination}")
             return
         for name in names:
-            self._write_resource(
-                (Config.LORA_TRAINING_DIRECTORY, destination.name, name),
-                destination / name,
-                force,
-            )
+            self._write_resource((*relative, name), destination / name, force)
 
     def _write_json(self, destination: Path, force: bool) -> None:
         self._write_resource(
