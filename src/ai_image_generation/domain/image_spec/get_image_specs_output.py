@@ -5,7 +5,7 @@ from ai_image_generation.domain.image_spec.image_spec import ImageSpec
 
 @dataclass
 class ImageSpecDto:
-    name: str
+    id: str
     width: int
     height: int
     positive_prompt: str
@@ -23,7 +23,7 @@ class GetImageSpecsOutput:
     @staticmethod
     def _to_dto(spec: ImageSpec) -> ImageSpecDto:
         return ImageSpecDto(
-            name=spec.name,
+            id=spec.id,
             width=spec.width,
             height=spec.height,
             positive_prompt=spec.prompt.positive_text(),

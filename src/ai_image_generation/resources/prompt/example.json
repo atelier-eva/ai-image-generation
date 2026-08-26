@@ -1,5 +1,4 @@
 {
-  "name": "example",
   "lora": {
     "id": "example.safetensors"
   },

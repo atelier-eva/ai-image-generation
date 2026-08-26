@@ -5,7 +5,7 @@ from ai_image_generation.domain.image_spec.prompt import Prompt
 
 @dataclass
 class ImageSpec:
-    name: str
+    id: str
     lora_id: str
     width: int
     height: int

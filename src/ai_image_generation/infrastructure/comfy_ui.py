@@ -14,6 +14,10 @@ _LORA_TRAINING_IMAGE_GENERATION_API_JSON = (
     "comfyui",
     "lora-training-image-generation-api.json",
 )
+_IMAGE_CREATION_API_JSON = (
+    "comfyui",
+    "image-creation-api.json",
+)
 
 
 class ComfyUi:
@@ -30,9 +34,12 @@ class ComfyUi:
         self._url = config.comfy_ui_url
         self._ckpt_name = config.comfy_ui_ckpt_name
         self._output_directory = config.output_directory
-        self._template = read_resource_json(*_LORA_TRAINING_IMAGE_GENERATION_API_JSON)
+        self._lora_training_template = read_resource_json(
+            *_LORA_TRAINING_IMAGE_GENERATION_API_JSON
+        )
+        self._template = read_resource_json(*_IMAGE_CREATION_API_JSON)
 
-    def generate_images(
+    def generate_lora_training_images(
         self,
         filename_prefix: str,
         width: int,
@@ -42,23 +49,47 @@ class ComfyUi:
         seed: int,
         batch_size: int = 4,
     ) -> tuple["ComfyUi.SavedImage", ...]:
-        workflow = self._workflow(
-            filename_prefix,
-            width,
-            height,
-            positive_prompt,
-            negative_prompt,
-            seed,
-            batch_size,
+        return self._queue_prompt(
+            self._lora_training_workflow(
+                filename_prefix,
+                width,
+                height,
+                positive_prompt,
+                negative_prompt,
+                seed,
+                batch_size,
+            )
         )
-        response = self._request("POST", "/prompt", {"prompt": workflow})
-        node_errors = response.get("node_errors")
-        if node_errors:
-            raise RuntimeError(f"ComfyUI node_errors: {node_errors}")
-        prompt_id = str(response.get("prompt_id") or "").strip()
-        if not prompt_id:
-            raise RuntimeError("ComfyUI /prompt did not return prompt_id.")
-        return self._wait_until_complete(prompt_id)
+
+    def generate_images(
+        self,
+        filename_prefix: str,
+        width: int,
+        height: int,
+        positive_prompt: str,
+        negative_prompt: str,
+        lora_name: str,
+        strength_model: float,
+        strength_clip: float,
+        pose_id: str | None,
+        seed: int,
+        batch_size: int = 4,
+    ) -> tuple["ComfyUi.SavedImage", ...]:
+        return self._queue_prompt(
+            self._workflow(
+                filename_prefix,
+                width,
+                height,
+                positive_prompt,
+                negative_prompt,
+                lora_name,
+                strength_model,
+                strength_clip,
+                pose_id,
+                seed,
+                batch_size,
+            )
+        )
 
     def fetch_image(self, image: "ComfyUi.SavedImage") -> bytes:
         query = urllib.parse.urlencode(
@@ -181,6 +212,37 @@ class ComfyUi:
             f"from prompt_id {prompt_id}."
         )
 
+    def _queue_prompt(self, workflow: dict[str, Any]) -> tuple["ComfyUi.SavedImage", ...]:
+        response = self._request("POST", "/prompt", {"prompt": workflow})
+        node_errors = response.get("node_errors")
+        if node_errors:
+            raise RuntimeError(f"ComfyUI node_errors: {node_errors}")
+        prompt_id = str(response.get("prompt_id") or "").strip()
+        if not prompt_id:
+            raise RuntimeError("ComfyUI /prompt did not return prompt_id.")
+        return self._wait_until_complete(prompt_id)
+
+    def _lora_training_workflow(
+        self,
+        filename_prefix: str,
+        width: int,
+        height: int,
+        positive_prompt: str,
+        negative_prompt: str,
+        seed: int,
+        batch_size: int,
+    ) -> dict[str, Any]:
+        workflow = copy.deepcopy(self._lora_training_template)
+        workflow["2"]["inputs"]["ckpt_name"] = self._ckpt_name
+        workflow["3"]["inputs"]["text"] = positive_prompt
+        workflow["4"]["inputs"]["text"] = negative_prompt
+        workflow["8"]["inputs"]["width"] = width
+        workflow["8"]["inputs"]["height"] = height
+        workflow["8"]["inputs"]["batch_size"] = batch_size
+        workflow["11"]["inputs"]["filename_prefix"] = filename_prefix
+        workflow["7"]["inputs"]["seed"] = seed
+        return workflow
+
     def _workflow(
         self,
         filename_prefix: str,
@@ -188,6 +250,10 @@ class ComfyUi:
         height: int,
         positive_prompt: str,
         negative_prompt: str,
+        lora_name: str,
+        strength_model: float,
+        strength_clip: float,
+        pose_id: str | None,
         seed: int,
         batch_size: int,
     ) -> dict[str, Any]:
@@ -199,5 +265,17 @@ class ComfyUi:
         workflow["8"]["inputs"]["height"] = height
         workflow["8"]["inputs"]["batch_size"] = batch_size
         workflow["11"]["inputs"]["filename_prefix"] = filename_prefix
+        workflow["16"]["inputs"]["lora_name"] = lora_name
+        workflow["16"]["inputs"]["strength_model"] = strength_model
+        workflow["16"]["inputs"]["strength_clip"] = strength_clip
         workflow["7"]["inputs"]["seed"] = seed
+        if pose_id is None:
+            del workflow["5"]
+            del workflow["6"]
+            del workflow["12"]
+            del workflow["13"]
+            workflow["7"]["inputs"]["positive"] = ["3", 0]
+            workflow["7"]["inputs"]["negative"] = ["4", 0]
+        else:
+            workflow["12"]["inputs"]["image"] = pose_id
         return workflow
