@@ -10,10 +10,10 @@ class ImageSpecDto:
     height: int
     positive_prompt: str
     negative_prompt: str
-    lora_name: str
+    lora_id: str
     model_strength: float
     text_encoder_strength: float
-    pose_image: str | None
+    pose_id: str | None
 
 
 class GetImageSpecsOutput:
@@ -28,8 +28,8 @@ class GetImageSpecsOutput:
             height=spec.height,
             positive_prompt=spec.prompt.positive_text(),
             negative_prompt=spec.prompt.negative_text(),
-            lora_name=spec.lora_name,
-            model_strength=spec.model_strength,
-            text_encoder_strength=spec.text_encoder_strength,
-            pose_image=spec.pose_image,
+            lora_id=spec.lora.id,
+            model_strength=spec.lora.model_strength,
+            text_encoder_strength=spec.lora.text_encoder_strength,
+            pose_id=spec.pose.id if spec.pose else None,
         )

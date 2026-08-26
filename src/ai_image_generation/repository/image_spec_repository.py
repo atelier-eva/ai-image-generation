@@ -3,12 +3,14 @@ from typing import Any
 
 from ai_image_generation.config import Config
 from ai_image_generation.domain.image_spec.image_spec import ImageSpec
+from ai_image_generation.domain.image_spec.lora import Lora
+from ai_image_generation.domain.image_spec.pose import Pose
 from ai_image_generation.domain.image_spec.prompt import Prompt
 from ai_image_generation.repository.json_io import read_json, to_string_tuple
 
 
 class ImageSpecRepository:
-    def get(self) -> tuple[ImageSpec, ...]
+    def get(self) -> tuple[ImageSpec, ...]:
         specs: list[ImageSpec] = []
         names: dict[str, Path] = {}
         for path in self._json_paths():
@@ -38,39 +40,36 @@ class ImageSpecRepository:
         return paths
 
     def _to_image_spec(self, data: dict[str, Any]) -> ImageSpec:
-        lora = data["lora"]
         size = data["image_size"]
         return ImageSpec(
             name=data["name"].strip(),
-            lora_name=lora["name"].strip(),
+            lora=self._to_lora(data["lora"]),
             width=size["width"],
             height=size["height"],
             prompt=Prompt(
                 positive_features=to_string_tuple(data.get("positive")),
                 negative_features=to_string_tuple(data.get("negative")),
             ),
-            model_strength=self._to_strength(lora.get("strength_model")),
-            text_encoder_strength=self._to_strength(lora.get("strength_clip")),
-            pose_image=self._to_pose_image(data),
+            pose=self._to_pose(data.get("pose")),
         )
 
-    def _to_pose_image(self, data: dict[str, Any]) -> str | None:
-        pose = data.get("pose")
-        if not pose:
+    def _to_lora(self, data: dict[str, Any]) -> Lora:
+        identifier = data["id"].strip()
+        if not identifier:
+            raise ValueError("lora.id is empty or missing.")
+        return Lora(
+            id=identifier,
+            model_strength=self._to_strength(data.get("strength_model")),
+            text_encoder_strength=self._to_strength(data.get("strength_clip")),
+        )
+
+    def _to_pose(self, data: dict[str, Any] | None) -> Pose | None:
+        if not data:
             return None
-        relative = str(pose["image"]).strip()
-        if not relative:
-            raise ValueError("pose.image is empty or missing.")
-        directory = Config().prompt_directory
-        base = directory.resolve()
-        resolved = (directory / relative).resolve()
-        if not resolved.is_relative_to(base):
-            raise ValueError(
-                f"Pose image is outside the prompt directory: {relative}"
-            )
-        if not resolved.is_file():
-            raise FileNotFoundError(f"Pose image not found: {resolved}")
-        return relative
+        identifier = str(data["id"]).strip()
+        if not identifier:
+            raise ValueError("pose.id is empty or missing.")
+        return Pose(id=identifier)
 
     def _to_strength(self, value: Any, default: float = 1.0) -> float:
         if value is None:

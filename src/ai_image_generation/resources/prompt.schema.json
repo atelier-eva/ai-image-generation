@@ -15,34 +15,34 @@
     "lora": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name"],
-      "description": "LoRA applied via ComfyUI LoraLoader. One per prompt.",
+      "required": ["id"],
+      "description": "LoRA applied to this spec. One per prompt.",
       "properties": {
-        "name": {
+        "id": {
           "type": "string",
           "minLength": 1,
-          "description": "Filename under ComfyUI models/loras, including optional subfolders (e.g. style/foo.safetensors)."
+          "description": "Identifier of the LoRA on the generation server. Not a path on the CLI host."
         },
         "strength_model": {
           "type": "number",
-          "description": "ComfyUI LoraLoader strength_model. When omitted, 1 is used."
+          "description": "Model strength when applying the LoRA. When omitted, 1 is used."
         },
         "strength_clip": {
           "type": "number",
-          "description": "ComfyUI LoraLoader strength_clip. When omitted, 1 is used."
+          "description": "Text-encoder strength when applying the LoRA. When omitted, 1 is used."
         }
       }
     },
     "pose": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["image"],
-      "description": "Optional pose image. Omit pose entirely to drop LoadImage/ControlNet from the submitted graph.",
+      "required": ["id"],
+      "description": "Optional pose on the generation server. Omit pose entirely when unused.",
       "properties": {
-        "image": {
+        "id": {
           "type": "string",
           "minLength": 1,
-          "description": "Path relative to the prompt/ directory (e.g. poses/standing.png). Uploaded to ComfyUI for LoadImage."
+          "description": "Identifier of the pose on the generation server. Not a path on the CLI host."
         }
       }
     },
@@ -58,11 +58,11 @@
     },
     "positive": {
       "$ref": "#/$defs/tags",
-      "description": "Positive prompt tags, joined for ComfyUI. Trigger words belong here. Empty emits no positive tags."
+      "description": "Positive prompt tags, joined for generation. Trigger words belong here. Empty emits no positive tags."
     },
     "negative": {
       "$ref": "#/$defs/tags",
-      "description": "Negative prompt tags, joined for ComfyUI. Empty emits no negative tags."
+      "description": "Negative prompt tags, joined for generation. Empty emits no negative tags."
     }
   },
   "$defs": {
