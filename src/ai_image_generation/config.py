@@ -22,6 +22,9 @@ class Config:
         self.comfy_ui_url = _text("COMFY_UI_URL").rstrip("/")
         self.comfy_ui_ckpt_name = _text("COMFY_UI_CKPT_NAME")
         self.comfy_ui_filename_prefix = _text("COMFY_UI_FILENAME_PREFIX")
+        ace_step_url = _optional_text("ACE_STEP_URL")
+        self.ace_step_url = ace_step_url.rstrip("/") if ace_step_url else None
+        self.ace_step_api_key = _optional_text("ACE_STEP_API_KEY")
         output_directory = _optional_directory("OUTPUT_DIRECTORY")
         if output_directory is None:
             output_directory = Path(self.DEFAULT_OUTPUT_DIRECTORY).expanduser().resolve()
@@ -47,6 +50,13 @@ def _optional_directory(name: str) -> Path | None:
     if path.exists() and not path.is_dir():
         raise NotADirectoryError(f"{name} is not a directory: {path}")
     return path
+
+
+def _optional_text(name: str) -> str | None:
+    value = (getenv(name) or "").strip()
+    if not value:
+        return None
+    return value
 
 
 def _text(name: str) -> str:
