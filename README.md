@@ -1,7 +1,17 @@
-# ai-image-generation-tool
+# ai-media-generation
 
 ## インストール
 
 ```bash
-uv tool install git+https://github.com/atelier-eva/ai-image-generation.git
+uv tool install git+https://github.com/atelier-eva/ai-media-generation.git
+```
+
+## 使い方
+
+```bash
+ai-media-generation init
+ai-media-generation lora-training
+ai-media-generation image
+ai-media-generation music
+ai-media-generation report
 ```
