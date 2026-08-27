@@ -16,39 +16,39 @@
   "json.schemas": [
     {
       "fileMatch": ["**/art-style.json"],
-      "url": "./src/ai_image_generation/resources/lora-training/art-style.schema.json"
+      "url": "./src/ai_media_generation/resources/lora-training/art-style.schema.json"
     },
     {
       "fileMatch": ["**/camera.json"],
-      "url": "./src/ai_image_generation/resources/lora-training/camera.schema.json"
+      "url": "./src/ai_media_generation/resources/lora-training/camera.schema.json"
     },
     {
       "fileMatch": ["**/characters/*.json"],
-      "url": "./src/ai_image_generation/resources/lora-training/characters.schema.json"
+      "url": "./src/ai_media_generation/resources/lora-training/characters.schema.json"
     },
     {
       "fileMatch": ["**/expression.json"],
-      "url": "./src/ai_image_generation/resources/lora-training/expression.schema.json"
+      "url": "./src/ai_media_generation/resources/lora-training/expression.schema.json"
     },
     {
       "fileMatch": ["**/generation.json"],
-      "url": "./src/ai_image_generation/resources/lora-training/generation.schema.json"
+      "url": "./src/ai_media_generation/resources/lora-training/generation.schema.json"
     },
     {
       "fileMatch": ["**/music/*.json"],
-      "url": "./src/ai_image_generation/resources/music.schema.json"
+      "url": "./src/ai_media_generation/resources/music.schema.json"
     },
     {
       "fileMatch": ["**/pose.json"],
-      "url": "./src/ai_image_generation/resources/lora-training/pose.schema.json"
+      "url": "./src/ai_media_generation/resources/lora-training/pose.schema.json"
     },
     {
       "fileMatch": ["**/prompt/*.json"],
-      "url": "./src/ai_image_generation/resources/prompt.schema.json"
+      "url": "./src/ai_media_generation/resources/prompt.schema.json"
     },
     {
       "fileMatch": ["**/scene.json"],
-      "url": "./src/ai_image_generation/resources/lora-training/scene.schema.json"
+      "url": "./src/ai_media_generation/resources/lora-training/scene.schema.json"
     }
   ],
   "search.exclude": {
