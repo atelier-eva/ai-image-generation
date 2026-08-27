@@ -63,7 +63,7 @@ class InitController:
         print(f"Input directory: {path}")
         print(
             "Fill in the JSON tags, then run: "
-            "ai-image-generation lora-training, image, or music"
+            "ai-media-generation lora-training, image, or music"
         )
 
     def _with_input_directory(self, text: str, directory: str) -> str:

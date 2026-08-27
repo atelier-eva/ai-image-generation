@@ -45,15 +45,15 @@ def main() -> None:
 
 
 def _command_parser(command: str) -> ArgumentParser:
-    return ArgumentParser(prog=f"ai-image-generation {command}")
+    return ArgumentParser(prog=f"ai-media-generation {command}")
 
 
 def _parser() -> ArgumentParser:
-    parser = ArgumentParser(prog="ai-image-generation")
+    parser = ArgumentParser(prog="ai-media-generation")
     parser.add_argument(
         "--version",
         action="version",
-        version=f"ai-image-generation {version('ai-image-generation')}",
+        version=f"ai-media-generation {version('ai-media-generation')}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser(
