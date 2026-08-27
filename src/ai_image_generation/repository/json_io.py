@@ -13,6 +13,7 @@ _SCHEMA_RESOURCES = {
     "characters": ("lora-training", "characters.schema.json"),
     "expression.json": ("lora-training", "expression.schema.json"),
     "generation.json": ("lora-training", "generation.schema.json"),
+    "music": ("music.schema.json",),
     "pose.json": ("lora-training", "pose.schema.json"),
     "prompt": ("prompt.schema.json",),
     "scene.json": ("lora-training", "scene.schema.json"),

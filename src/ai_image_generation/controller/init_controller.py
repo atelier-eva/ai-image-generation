@@ -25,6 +25,7 @@ class InitController:
                 "Root directory for feature input folders. "
                 f"LoRA templates go in {Config.LORA_TRAINING_DIRECTORY}/. "
                 f"Prompt templates go in {Config.PROMPT_DIRECTORY}/. "
+                f"Music templates go in {Config.MUSIC_DIRECTORY}/. "
                 f"Defaults to INPUT_DIRECTORY or {Config.DEFAULT_INPUT_DIRECTORY}."
             ),
         )
@@ -53,11 +54,16 @@ class InitController:
             path / Config.PROMPT_DIRECTORY,
             args.force,
         )
+        self._write_directory(
+            (Config.MUSIC_DIRECTORY,),
+            path / Config.MUSIC_DIRECTORY,
+            args.force,
+        )
         self._write_env(text)
         print(f"Input directory: {path}")
         print(
             "Fill in the JSON tags, then run: "
-            "ai-image-generation lora-training or image"
+            "ai-image-generation lora-training, image, or music"
         )
 
     def _with_input_directory(self, text: str, directory: str) -> str:
