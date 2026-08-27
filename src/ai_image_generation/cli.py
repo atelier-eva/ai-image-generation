@@ -13,6 +13,9 @@ from ai_image_generation.controller.generate_images_controller import (
 from ai_image_generation.controller.generate_lora_training_images_controller import (
     GenerateLoraTrainingImagesController,
 )
+from ai_image_generation.controller.generate_music_controller import (
+    GenerateMusicController,
+)
 from ai_image_generation.controller.init_controller import InitController
 from ai_image_generation.controller.report_lora_training_patterns_controller import (
     ReportLoraTrainingPatternsController,
@@ -31,6 +34,9 @@ def main() -> None:
         return
     if command == "image":
         GenerateImagesController().execute(_command_parser("image"))
+        return
+    if command == "music":
+        GenerateMusicController().execute(_command_parser("music"))
         return
     if command == "report":
         ReportLoraTrainingPatternsController().execute(_command_parser("report"))
@@ -57,6 +63,10 @@ def _parser() -> ArgumentParser:
     subparsers.add_parser(
         "image",
         help="Generate images from prompt/*.json specs.",
+    )
+    subparsers.add_parser(
+        "music",
+        help="Generate music from music/*.json specs.",
     )
     subparsers.add_parser(
         "init",

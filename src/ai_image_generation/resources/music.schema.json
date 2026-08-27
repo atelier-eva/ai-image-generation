@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.spec/music.schema.json",
+  "title": "Music (music/*.json)",
+  "description": "One music spec per JSON file under music/. The file stem is the spec id. Specified-prompt music generation; unused optional keys are omitted.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["prompt"],
+  "properties": {
+    "prompt": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Music description sent to ACE-Step as prompt. Prose, not tag arrays."
+    },
+    "lyrics": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Lyrics as a single string. Omit when unused."
+    },
+    "vocal_language": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Vocal language code (e.g. ja, en). Omit when unused."
+    },
+    "duration": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Audio duration in seconds. Mapped to ACE-Step audio_duration. Omit when unused."
+    },
+    "bpm": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "description": "Beats per minute. Omit when unused."
+    }
+  }
+}
