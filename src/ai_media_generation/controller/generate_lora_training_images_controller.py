@@ -41,6 +41,10 @@ class GenerateLoraTrainingImagesController:
         for index in range(start, end):
             pattern = patterns[index]
             filename_prefix = self._filename_prefix(pattern, index + 1, prefix)
+            fields = self._pattern_fields(pattern)
+            if log.contains(**fields):
+                print(f"[{index + 1}/{end}] {filename_prefix} skip")
+                continue
             seed = args.base_seed + index * args.batch_size
             print(f"[{index + 1}/{end}] {filename_prefix} seed={seed}")
             images = comfy_ui.generate_lora_training_images(
@@ -59,20 +63,27 @@ class GenerateLoraTrainingImagesController:
             if written:
                 print(f"  captions: {written}")
             log.append(
-                subject=pattern.subject_name,
-                angle=pattern.angle_name,
-                distance=pattern.distance_name,
-                expression=pattern.expression_name,
-                pose=pattern.pose_name,
-                art_style=pattern.art_style_name,
-                background=pattern.background_name,
-                lighting=pattern.lighting_name,
+                **fields,
                 row=index + 1,
                 seed=seed,
                 batch_size=args.batch_size,
                 files=self._relative_files(images),
             )
         print(f"Done. {end - start} rows.")
+
+    def _pattern_fields(
+        self, pattern: GenerateShootPatternsOutput
+    ) -> dict[str, str | None]:
+        return {
+            "subject": pattern.subject_name,
+            "angle": pattern.angle_name,
+            "distance": pattern.distance_name,
+            "expression": pattern.expression_name,
+            "pose": pattern.pose_name,
+            "art_style": pattern.art_style_name,
+            "background": pattern.background_name,
+            "lighting": pattern.lighting_name,
+        }
 
     def _relative_files(
         self, images: tuple[ComfyUi.SavedImage, ...]
