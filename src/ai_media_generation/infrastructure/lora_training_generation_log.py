@@ -89,6 +89,7 @@ class LoraTrainingGenerationLog:
         art_style: str | None,
         background: str | None,
         lighting: str | None,
+        seed: int,
     ) -> bool:
         key = self._pattern_key(
             subject,
@@ -100,38 +101,10 @@ class LoraTrainingGenerationLog:
             background,
             lighting,
         )
-        return any(self._pattern_key_of(record) == key for record in self._records())
-
-    def max_seed(
-        self,
-        *,
-        subject: str,
-        angle: str,
-        distance: str,
-        expression: str | None,
-        pose: str | None,
-        art_style: str | None,
-        background: str | None,
-        lighting: str | None,
-    ) -> int | None:
-        key = self._pattern_key(
-            subject,
-            angle,
-            distance,
-            expression,
-            pose,
-            art_style,
-            background,
-            lighting,
-        )
-        seeds = [
-            record.seed
+        return any(
+            self._pattern_key_of(record) == key and record.seed == seed
             for record in self._records()
-            if self._pattern_key_of(record) == key
-        ]
-        if not seeds:
-            return None
-        return max(seeds)
+        )
 
     def _dumps(self, record: "_Record") -> str:
         return json.dumps(

@@ -42,10 +42,10 @@ class GenerateLoraTrainingImagesController:
             pattern = patterns[index]
             filename_prefix = self._filename_prefix(pattern, index + 1, prefix)
             fields = self._pattern_fields(pattern)
-            if log.contains(**fields):
-                print(f"[{index + 1}/{end}] {filename_prefix} skip")
-                continue
             seed = args.base_seed + index
+            if log.contains(**fields, seed=seed):
+                print(f"[{index + 1}/{end}] {filename_prefix} skip seed={seed}")
+                continue
             print(f"[{index + 1}/{end}] {filename_prefix} seed={seed}")
             images = comfy_ui.generate_lora_training_images(
                 filename_prefix,
