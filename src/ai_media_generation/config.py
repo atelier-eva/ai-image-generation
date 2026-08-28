@@ -6,6 +6,7 @@ class Config:
     DEFAULT_INPUT_DIRECTORY = "ai-media-generation"
     DEFAULT_OUTPUT_DIRECTORY = "output"
     LORA_TRAINING_DIRECTORY = "lora-training"
+    LORA_TRAINING_GENERATIONS_JSONL = "lora-training-generations.jsonl"
     PROMPT_DIRECTORY = "prompt"
     MUSIC_DIRECTORY = "music"
 
@@ -38,6 +39,9 @@ class Config:
                     f"OUTPUT_DIRECTORY is not a directory: {output_directory}"
                 )
         self.output_directory = output_directory
+        self.lora_training_generations_jsonl = (
+            output_directory / self.LORA_TRAINING_GENERATIONS_JSONL
+        )
 
 
 def _directory(name: str) -> Path:
