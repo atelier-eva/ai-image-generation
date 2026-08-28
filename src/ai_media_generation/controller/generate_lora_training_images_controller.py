@@ -45,7 +45,7 @@ class GenerateLoraTrainingImagesController:
             if log.contains(**fields):
                 print(f"[{index + 1}/{end}] {filename_prefix} skip")
                 continue
-            seed = args.base_seed + index * args.batch_size
+            seed = args.base_seed + index
             print(f"[{index + 1}/{end}] {filename_prefix} seed={seed}")
             images = comfy_ui.generate_lora_training_images(
                 filename_prefix,
