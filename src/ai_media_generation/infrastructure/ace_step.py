@@ -38,7 +38,7 @@ class AceStep:
         audio_format: str = "mp3",
         inference_steps: int = 8,
         seed: int | None = None,
-        batch_size: int = 1,
+        batch_size: int = 4,
     ) -> tuple["AceStep.SavedAudio", ...]:
         prefix = filename_prefix.strip()
         if not prefix:

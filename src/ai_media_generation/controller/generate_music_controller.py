@@ -11,7 +11,7 @@ from ai_media_generation.infrastructure.ace_step import AceStep
 class GenerateMusicController:
     def execute(self, parser: ArgumentParser) -> None:
         parser.add_argument("--base-seed", type=int, default=0)
-        parser.add_argument("--batch-size", type=int, default=1)
+        parser.add_argument("--batch-size", type=int, default=4)
         parser.add_argument(
             "files",
             nargs="*",
