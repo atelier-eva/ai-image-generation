@@ -10,6 +10,9 @@ from ai_media_generation.domain.shoot.generate_shoot_patterns_output import (
     GenerateShootPatternsOutput,
 )
 from ai_media_generation.infrastructure.comfy_ui import ComfyUi
+from ai_media_generation.infrastructure.lora_training_generation_log import (
+    LoraTrainingGenerationLog,
+)
 
 
 class GenerateLoraTrainingImagesController:
@@ -34,11 +37,12 @@ class GenerateLoraTrainingImagesController:
         print(f"Processing rows {start + 1}..{end} of {len(patterns)}.")
         prefix = Config().comfy_ui_filename_prefix
         comfy_ui = ComfyUi()
+        log = LoraTrainingGenerationLog()
         for index in range(start, end):
             pattern = patterns[index]
             filename_prefix = self._filename_prefix(pattern, index + 1, prefix)
-            print(f"[{index + 1}/{end}] {filename_prefix}")
             seed = args.base_seed + index * args.batch_size
+            print(f"[{index + 1}/{end}] {filename_prefix} seed={seed}")
             images = comfy_ui.generate_lora_training_images(
                 filename_prefix,
                 pattern.width,
@@ -54,7 +58,32 @@ class GenerateLoraTrainingImagesController:
             written = comfy_ui.write_captions(images, pattern.caption_prompt)
             if written:
                 print(f"  captions: {written}")
+            log.append(
+                subject=pattern.subject_name,
+                angle=pattern.angle_name,
+                distance=pattern.distance_name,
+                expression=pattern.expression_name,
+                pose=pattern.pose_name,
+                art_style=pattern.art_style_name,
+                background=pattern.background_name,
+                lighting=pattern.lighting_name,
+                row=index + 1,
+                seed=seed,
+                batch_size=args.batch_size,
+                files=self._relative_files(images),
+            )
         print(f"Done. {end - start} rows.")
+
+    def _relative_files(
+        self, images: tuple[ComfyUi.SavedImage, ...]
+    ) -> tuple[str, ...]:
+        files: list[str] = []
+        for image in images:
+            if image.subfolder:
+                files.append(f"{image.subfolder}/{image.filename}")
+            else:
+                files.append(image.filename)
+        return tuple(files)
 
     def _filename_prefix(
         self,
