@@ -29,7 +29,7 @@ class GenerateMusicController:
         ace_step = AceStep()
         for index, spec in enumerate(specs):
             filename_prefix = f"{prefix}_{spec.id}"
-            seed = args.base_seed + index * args.batch_size
+            seed = args.base_seed + index
             print(f"[{index + 1}/{len(specs)}] {filename_prefix} seed={seed}")
             options: dict[str, Any] = {
                 "seed": seed,
