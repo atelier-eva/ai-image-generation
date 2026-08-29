@@ -75,7 +75,7 @@ class LoraTrainingGenerationLog:
         )
         self._path.parent.mkdir(parents=True, exist_ok=True)
         with self._path.open("a", encoding="utf-8", newline="\n") as file:
-            file.write(self._dumps(record))
+            file.write(self._to_line(record))
             file.write("\n")
 
     def contains(
@@ -106,7 +106,7 @@ class LoraTrainingGenerationLog:
             for record in self._records()
         )
 
-    def _dumps(self, record: "_Record") -> str:
+    def _to_line(self, record: "_Record") -> str:
         return json.dumps(
             {
                 "subject": record.subject,
