@@ -38,6 +38,23 @@ class LoraTrainingGenerationLog:
         batch_size: int
         files: tuple[str, ...]
 
+        @property
+        def identity(
+            self,
+        ) -> tuple[
+            str, str, str, str | None, str | None, str | None, str | None, str | None
+        ]:
+            return (
+                self.subject,
+                self.angle,
+                self.distance,
+                self.expression,
+                self.pose,
+                self.art_style,
+                self.background,
+                self.lighting,
+            )
+
     def __init__(self) -> None:
         self._path = Config().lora_training_generations_jsonl
 
@@ -75,7 +92,7 @@ class LoraTrainingGenerationLog:
         )
         self._path.parent.mkdir(parents=True, exist_ok=True)
         with self._path.open("a", encoding="utf-8", newline="\n") as file:
-            file.write(self._dumps(record))
+            file.write(self._to_line(record))
             file.write("\n")
 
     def contains(
@@ -91,7 +108,7 @@ class LoraTrainingGenerationLog:
         lighting: str | None,
         seed: int,
     ) -> bool:
-        key = self._pattern_key(
+        identity = (
             subject,
             angle,
             distance,
@@ -102,11 +119,11 @@ class LoraTrainingGenerationLog:
             lighting,
         )
         return any(
-            self._pattern_key_of(record) == key and record.seed == seed
+            record.identity == identity and record.seed == seed
             for record in self._records()
         )
 
-    def _dumps(self, record: "_Record") -> str:
+    def _to_line(self, record: "_Record") -> str:
         return json.dumps(
             {
                 "subject": record.subject,
@@ -144,57 +161,17 @@ class LoraTrainingGenerationLog:
             raise self._error(f"{name} must be >= {minimum}.", line_number)
         return value
 
-    def _name(self, value: Any, name: str, line_number: int | None) -> str:
+    def _str_field(self, value: Any, name: str, line_number: int | None) -> str:
         if not isinstance(value, str) or not value.strip():
             raise self._error(f"{name} must be a non-empty string.", line_number)
         return value.strip()
 
-    def _optional_name(
+    def _optional_str_field(
         self, value: Any, name: str, line_number: int | None
     ) -> str | None:
         if value is None:
             return None
-        return self._name(value, name, line_number)
-
-    def _pattern_key(
-        self,
-        subject: str,
-        angle: str,
-        distance: str,
-        expression: str | None,
-        pose: str | None,
-        art_style: str | None,
-        background: str | None,
-        lighting: str | None,
-    ) -> tuple[
-        str, str, str, str | None, str | None, str | None, str | None, str | None
-    ]:
-        return (
-            subject,
-            angle,
-            distance,
-            expression,
-            pose,
-            art_style,
-            background,
-            lighting,
-        )
-
-    def _pattern_key_of(
-        self, record: "_Record"
-    ) -> tuple[
-        str, str, str, str | None, str | None, str | None, str | None, str | None
-    ]:
-        return self._pattern_key(
-            record.subject,
-            record.angle,
-            record.distance,
-            record.expression,
-            record.pose,
-            record.art_style,
-            record.background,
-            record.lighting,
-        )
+        return self._str_field(value, name, line_number)
 
     def _record(
         self, data: dict[str, Any], line_number: int | None = None
@@ -213,18 +190,18 @@ class LoraTrainingGenerationLog:
                 "files must be an array of non-empty strings.", line_number
             )
         return self._Record(
-            subject=self._name(data["subject"], "subject", line_number),
-            angle=self._name(data["angle"], "angle", line_number),
-            distance=self._name(data["distance"], "distance", line_number),
-            expression=self._optional_name(
+            subject=self._str_field(data["subject"], "subject", line_number),
+            angle=self._str_field(data["angle"], "angle", line_number),
+            distance=self._str_field(data["distance"], "distance", line_number),
+            expression=self._optional_str_field(
                 data["expression"], "expression", line_number
             ),
-            pose=self._optional_name(data["pose"], "pose", line_number),
-            art_style=self._optional_name(data["art_style"], "art_style", line_number),
-            background=self._optional_name(
+            pose=self._optional_str_field(data["pose"], "pose", line_number),
+            art_style=self._optional_str_field(data["art_style"], "art_style", line_number),
+            background=self._optional_str_field(
                 data["background"], "background", line_number
             ),
-            lighting=self._optional_name(data["lighting"], "lighting", line_number),
+            lighting=self._optional_str_field(data["lighting"], "lighting", line_number),
             row=self._int_field(data, "row", minimum=1, line_number=line_number),
             seed=self._int_field(data, "seed", minimum=0, line_number=line_number),
             batch_size=self._int_field(
