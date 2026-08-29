@@ -2,7 +2,8 @@
   "recommendations": [
     "eamodio.gitlens",
     "redhat.vscode-yaml",
-    "shd101wyy.markdown-preview-enhanced"
+    "shd101wyy.markdown-preview-enhanced",
+    "vscode-infra.image-viewer"
   ],
   "unwantedRecommendations": []
 }

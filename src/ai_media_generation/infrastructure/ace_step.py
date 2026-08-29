@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ai_media_generation.config import Config
+from ai_media_generation.infrastructure.error import InfrastructureError
 
 
 class AceStep:
@@ -64,17 +65,17 @@ class AceStep:
             body["seed"] = seed
         data = self._request("POST", "/release_task", body)
         if not isinstance(data, dict):
-            raise RuntimeError("ACE-Step /release_task did not return an object.")
+            raise InfrastructureError("ACE-Step /release_task did not return an object.")
         task_id = str(data.get("task_id") or "").strip()
         if not task_id:
-            raise RuntimeError("ACE-Step /release_task did not return task_id.")
+            raise InfrastructureError("ACE-Step /release_task did not return task_id.")
         files = [
             file
             for item in self._wait_until_complete(task_id)
             if (file := str(item.get("file") or "").strip())
         ]
         if not files:
-            raise RuntimeError("ACE-Step generation succeeded without audio files.")
+            raise InfrastructureError("ACE-Step generation succeeded without audio files.")
         extension = self._extension(audio_format)
         if len(files) == 1:
             return (AceStep.SavedAudio(filename=f"{prefix}.{extension}", file=files[0]),)
@@ -93,13 +94,13 @@ class AceStep:
             with urllib.request.urlopen(request) as response:
                 return response.read()
         except urllib.error.HTTPError as error:
-            raise RuntimeError(self._http_error_message(audio.file, error)) from error
+            raise InfrastructureError(self._http_error_message(audio.file, error)) from error
         except urllib.error.URLError as error:
-            raise RuntimeError(f"ACE-Step is not reachable at {self._url}") from error
+            raise InfrastructureError(f"ACE-Step is not reachable at {self._url}") from error
 
     def write_audio(self, audios: tuple["AceStep.SavedAudio", ...]) -> int:
         if not audios:
-            raise RuntimeError("No saved audio from ACE-Step; cannot write audio.")
+            raise InfrastructureError("No saved audio from ACE-Step; cannot write audio.")
         written = 0
         for audio in audios:
             path = self._output_directory / audio.filename
@@ -156,13 +157,13 @@ class AceStep:
             try:
                 result = json.loads(result)
             except json.JSONDecodeError as error:
-                raise RuntimeError("ACE-Step result was not valid JSON.") from error
+                raise InfrastructureError("ACE-Step result was not valid JSON.") from error
         if not isinstance(result, list):
-            raise RuntimeError("ACE-Step result was not a list.")
+            raise InfrastructureError("ACE-Step result was not a list.")
         items: list[dict[str, Any]] = []
         for item in result:
             if not isinstance(item, dict):
-                raise RuntimeError("ACE-Step result item was not an object.")
+                raise InfrastructureError("ACE-Step result item was not an object.")
             items.append(item)
         return items
 
@@ -184,17 +185,17 @@ class AceStep:
             with urllib.request.urlopen(request) as response:
                 loaded = json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as error:
-            raise RuntimeError(self._http_error_message(path, error)) from error
+            raise InfrastructureError(self._http_error_message(path, error)) from error
         except urllib.error.URLError as error:
-            raise RuntimeError(f"ACE-Step is not reachable at {self._url}") from error
+            raise InfrastructureError(f"ACE-Step is not reachable at {self._url}") from error
         except json.JSONDecodeError as error:
-            raise RuntimeError(f"ACE-Step {path} did not return JSON.") from error
+            raise InfrastructureError(f"ACE-Step {path} did not return JSON.") from error
         if not isinstance(loaded, dict):
-            raise RuntimeError(f"ACE-Step {path} did not return an object.")
+            raise InfrastructureError(f"ACE-Step {path} did not return an object.")
         code = loaded.get("code")
         if code not in (None, 200):
             message = loaded.get("error") or f"code {code}"
-            raise RuntimeError(f"ACE-Step {path} failed: {message}")
+            raise InfrastructureError(f"ACE-Step {path} failed: {message}")
         return loaded.get("data")
 
     def _wait_until_complete(self, task_id: str) -> list[dict[str, Any]]:
@@ -207,7 +208,7 @@ class AceStep:
                 {"task_id_list": [task_id]},
             )
             if not isinstance(data, list):
-                raise RuntimeError("ACE-Step /query_result did not return a list.")
+                raise InfrastructureError("ACE-Step /query_result did not return a list.")
             entry = next(
                 (
                     item
@@ -221,11 +222,11 @@ class AceStep:
                 continue
             status = entry.get("status")
             if status == 2:
-                raise RuntimeError(f"ACE-Step generation failed for task_id {task_id}.")
+                raise InfrastructureError(f"ACE-Step generation failed for task_id {task_id}.")
             if status != 1:
                 continue
             return self._parse_result(entry.get("result"))
-        raise TimeoutError(
+        raise InfrastructureError(
             f"Timed out after {self._POLL_TIMEOUT_SECONDS}s waiting for audio "
             f"from task_id {task_id}."
         )

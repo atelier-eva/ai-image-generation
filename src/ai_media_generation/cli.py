@@ -3,7 +3,7 @@
 from argparse import ArgumentParser
 from importlib.metadata import version
 from pathlib import Path
-from sys import argv
+from sys import argv, stderr
 
 from dotenv import load_dotenv
 
@@ -20,10 +20,26 @@ from ai_media_generation.controller.init_controller import InitController
 from ai_media_generation.controller.report_lora_training_patterns_controller import (
     ReportLoraTrainingPatternsController,
 )
+from ai_media_generation.infrastructure.error import InfrastructureError
+
+_USER_ERRORS = (
+    FileNotFoundError,
+    InfrastructureError,
+    NotADirectoryError,
+    ValueError,
+)
 
 
 def main() -> None:
     load_dotenv(Path.cwd() / ".env")
+    try:
+        _run()
+    except _USER_ERRORS as error:
+        print(f"ai-media-generation: error: {error}", file=stderr)
+        raise SystemExit(1) from error
+
+
+def _run() -> None:
     arguments = argv[1:]
     command = arguments[0] if arguments else ""
     if command == "init":
