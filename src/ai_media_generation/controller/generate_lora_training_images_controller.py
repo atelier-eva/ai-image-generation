@@ -33,7 +33,7 @@ class GenerateLoraTrainingImagesController:
         )
         args = parser.parse_args(argv[2:])
         patterns = GenerateShootPatterns().execute()
-        start, end = self._row_range(args.from_row, args.to_row, patterns)
+        start, end = self._row_range(parser, args.from_row, args.to_row, patterns)
         print(f"Processing rows {start + 1}..{end} of {len(patterns)}.")
         prefix = Config().comfy_ui_filename_prefix
         comfy_ui = ComfyUi()
@@ -122,6 +122,7 @@ class GenerateLoraTrainingImagesController:
 
     def _row_range(
         self,
+        parser: ArgumentParser,
         from_row: int,
         to_row: int,
         patterns: tuple[GenerateShootPatternsOutput, ...],
@@ -129,14 +130,21 @@ class GenerateLoraTrainingImagesController:
         if not patterns:
             raise ValueError("No prompt patterns to generate.")
         if from_row < 1:
-            raise ValueError("FromRow must be >= 1.")
+            parser.error(
+                "--from-row must be 1 or greater. "
+                "The first prompt is --from-row 1. "
+                "--from-row 0 is not allowed "
+                "(unlike --to-row 0, which means the last row)."
+            )
         last_row = len(patterns) if to_row <= 0 else to_row
         if last_row > len(patterns):
-            raise ValueError(
-                f"ToRow ({last_row}) exceeds row count ({len(patterns)})."
+            parser.error(
+                f"--to-row {last_row} is past the last prompt row ({len(patterns)})."
             )
         if from_row > last_row:
-            raise ValueError(f"FromRow ({from_row}) must be <= ToRow ({last_row}).")
+            parser.error(
+                f"--from-row {from_row} must be <= --to-row {last_row}."
+            )
         return from_row - 1, last_row
 
     def _slug(self, name: str) -> str:

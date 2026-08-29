@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ai_media_generation.config import Config
+from ai_media_generation.infrastructure.error import InfrastructureError
 from ai_media_generation.repository.json_io import read_resource_json
 
 _LORA_TRAINING_IMAGE_GENERATION_API_JSON = (
@@ -104,11 +105,11 @@ class ComfyUi:
             with urllib.request.urlopen(request) as response:
                 return response.read()
         except urllib.error.HTTPError as error:
-            raise RuntimeError(
+            raise InfrastructureError(
                 f"ComfyUI /view failed for {image.filename}: {error.code}"
             ) from error
         except urllib.error.URLError as error:
-            raise RuntimeError(f"ComfyUI is not reachable at {self._url}") from error
+            raise InfrastructureError(f"ComfyUI is not reachable at {self._url}") from error
 
     def write_captions(
         self,
@@ -120,7 +121,7 @@ class ComfyUi:
         if not text:
             raise ValueError("caption_prompt is empty or missing.")
         if not images:
-            raise RuntimeError(
+            raise InfrastructureError(
                 "No saved images in ComfyUI history; cannot write captions."
             )
         written = 0
@@ -137,7 +138,7 @@ class ComfyUi:
     def write_images(self, images: tuple["ComfyUi.SavedImage", ...]) -> int:
         directory = self._output_directory
         if not images:
-            raise RuntimeError(
+            raise InfrastructureError(
                 "No saved images in ComfyUI history; cannot write images."
             )
         written = 0
@@ -171,9 +172,9 @@ class ComfyUi:
             with urllib.request.urlopen(request) as response:
                 loaded = json.loads(response.read().decode("utf-8"))
         except urllib.error.URLError as error:
-            raise RuntimeError(f"ComfyUI is not reachable at {self._url}") from error
+            raise InfrastructureError(f"ComfyUI is not reachable at {self._url}") from error
         if not isinstance(loaded, dict):
-            raise RuntimeError(f"ComfyUI {path} did not return an object.")
+            raise InfrastructureError(f"ComfyUI {path} did not return an object.")
         return loaded
 
     def _saved_images(self, entry: dict[str, Any]) -> tuple["ComfyUi.SavedImage", ...]:
@@ -201,13 +202,13 @@ class ComfyUi:
                 continue
             status = entry.get("status") or {}
             if status.get("status_str") == "error":
-                raise RuntimeError(f"ComfyUI generation failed: {status.get('messages')}")
+                raise InfrastructureError(f"ComfyUI generation failed: {status.get('messages')}")
             if not self._completed(status):
                 continue
             images = self._saved_images(entry)
             if images:
                 return images
-        raise TimeoutError(
+        raise InfrastructureError(
             f"Timed out after {self._POLL_TIMEOUT_SECONDS}s waiting for image outputs "
             f"from prompt_id {prompt_id}."
         )
@@ -216,10 +217,10 @@ class ComfyUi:
         response = self._request("POST", "/prompt", {"prompt": workflow})
         node_errors = response.get("node_errors")
         if node_errors:
-            raise RuntimeError(f"ComfyUI node_errors: {node_errors}")
+            raise InfrastructureError(f"ComfyUI node_errors: {node_errors}")
         prompt_id = str(response.get("prompt_id") or "").strip()
         if not prompt_id:
-            raise RuntimeError("ComfyUI /prompt did not return prompt_id.")
+            raise InfrastructureError("ComfyUI /prompt did not return prompt_id.")
         return self._wait_until_complete(prompt_id)
 
     def _lora_training_workflow(
