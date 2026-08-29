@@ -17,7 +17,12 @@ from ai_media_generation.infrastructure.lora_training_generation_log import (
 
 class GenerateLoraTrainingImagesController:
     def execute(self, parser: ArgumentParser) -> None:
-        parser.add_argument("--base-seed", type=int, default=0)
+        parser.add_argument(
+            "--base-seed",
+            type=int,
+            default=0,
+            help="Seed for --from-row. Later rows increment by 1.",
+        )
         parser.add_argument("--batch-size", type=int, default=4)
         parser.add_argument(
             "--from-row",
@@ -42,7 +47,7 @@ class GenerateLoraTrainingImagesController:
             pattern = patterns[index]
             filename_prefix = self._filename_prefix(pattern, index + 1, prefix)
             fields = self._pattern_fields(pattern)
-            seed = args.base_seed + index
+            seed = args.base_seed + (index - start)
             if log.contains(**fields, seed=seed):
                 print(f"[{index + 1}/{end}] {filename_prefix} skip seed={seed}")
                 continue
