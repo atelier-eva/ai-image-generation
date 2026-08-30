@@ -25,7 +25,9 @@ class GenerateMusicController:
         if not specs:
             raise ValueError("No music JSON to generate.")
         print(f"Processing {len(specs)} music JSON file(s).")
-        prefix = Config().ace_step_filename_prefix
+        config = Config()
+        prefix = config.ace_step_filename_prefix
+        directory = config.music_output_directory
         ace_step = AceStep()
         for index, spec in enumerate(specs):
             filename_prefix = f"{prefix}_{spec.id}"
@@ -44,7 +46,7 @@ class GenerateMusicController:
             audios = ace_step.generate(
                 filename_prefix, spec.prompt, spec.lyrics, **options
             )
-            written = ace_step.write_audio(audios)
+            written = ace_step.write_audio(audios, directory)
             if written:
                 print(f"  audio: {written}")
         print(f"Done. {len(specs)} file(s).")

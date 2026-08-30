@@ -40,7 +40,9 @@ class GenerateLoraTrainingImagesController:
         patterns = GenerateShootPatterns().execute()
         start, end = self._row_range(parser, args.from_row, args.to_row, patterns)
         print(f"Processing rows {start + 1}..{end} of {len(patterns)}.")
-        prefix = Config().comfy_ui_filename_prefix
+        config = Config()
+        prefix = config.comfy_ui_filename_prefix
+        directory = config.lora_dataset_directory
         comfy_ui = ComfyUi()
         log = LoraTrainingGenerationLog()
         for index in range(start, end):
@@ -61,10 +63,12 @@ class GenerateLoraTrainingImagesController:
                 seed,
                 args.batch_size,
             )
-            written = comfy_ui.write_images(images)
+            written = comfy_ui.write_images(images, directory)
             if written:
                 print(f"  images: {written}")
-            written = comfy_ui.write_captions(images, pattern.caption_prompt)
+            written = comfy_ui.write_captions(
+                images, pattern.caption_prompt, directory
+            )
             if written:
                 print(f"  captions: {written}")
             log.append(

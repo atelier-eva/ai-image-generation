@@ -23,7 +23,9 @@ class GenerateImagesController:
         if not specs:
             raise ValueError("No prompt JSON to generate.")
         print(f"Processing {len(specs)} prompt JSON file(s).")
-        prefix = Config().comfy_ui_filename_prefix
+        config = Config()
+        prefix = config.comfy_ui_filename_prefix
+        directory = config.image_output_directory
         comfy_ui = ComfyUi()
         for index, spec in enumerate(specs):
             filename_prefix = f"{prefix}/{spec.id}"
@@ -42,7 +44,7 @@ class GenerateImagesController:
                 seed,
                 args.batch_size,
             )
-            written = comfy_ui.write_images(images)
+            written = comfy_ui.write_images(images, directory)
             if written:
                 print(f"  images: {written}")
         print(f"Done. {len(specs)} file(s).")

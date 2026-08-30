@@ -5,6 +5,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from ai_media_generation.config import Config
@@ -34,7 +35,6 @@ class ComfyUi:
         config = Config()
         self._url = config.comfy_ui_url
         self._ckpt_name = config.comfy_ui_ckpt_name
-        self._output_directory = config.output_directory
         self._lora_training_template = read_resource_json(
             *_LORA_TRAINING_IMAGE_GENERATION_API_JSON
         )
@@ -115,8 +115,8 @@ class ComfyUi:
         self,
         images: tuple["ComfyUi.SavedImage", ...],
         caption: str,
+        directory: Path,
     ) -> int:
-        directory = self._output_directory
         text = caption.strip()
         if not text:
             raise ValueError("caption_prompt is empty or missing.")
@@ -135,8 +135,9 @@ class ComfyUi:
             written += 1
         return written
 
-    def write_images(self, images: tuple["ComfyUi.SavedImage", ...]) -> int:
-        directory = self._output_directory
+    def write_images(
+        self, images: tuple["ComfyUi.SavedImage", ...], directory: Path
+    ) -> int:
         if not images:
             raise InfrastructureError(
                 "No saved images in ComfyUI history; cannot write images."
