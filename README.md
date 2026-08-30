@@ -15,5 +15,3 @@ ai-media-generation image
 ai-media-generation music
 ai-media-generation report
 ```
-
-`image` の `COMFY_UI_FILENAME_PREFIX` はファイル名用（サブフォルダではない）。以前の `image-output/<prefix>/...` 配下の成果物はそのまま残る。
