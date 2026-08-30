@@ -1,4 +1,5 @@
 import json
+from collections.abc import Callable
 from functools import cache
 from importlib.resources import files
 from pathlib import Path
@@ -6,6 +7,8 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError, best_match
+
+from ai_media_generation.config import Config
 
 _SCHEMA_RESOURCES = {
     "art-style.json": ("lora-training", "art-style.schema.json"),
@@ -71,7 +74,26 @@ def to_string_tuple(value: Any) -> tuple[str, ...]:
 
 
 def _schema_resource(path: Path) -> tuple[str, ...] | None:
-    return _SCHEMA_RESOURCES.get(path.parent.name) or _SCHEMA_RESOURCES.get(path.name)
+    try:
+        config = Config()
+    except ValueError:
+        return _SCHEMA_RESOURCES.get(path.name)
+    for key, directory in (
+        ("prompt", lambda: config.prompt_directory),
+        ("music", lambda: config.music_directory),
+        ("characters", lambda: config.characters_directory),
+    ):
+        root = _directory_or_none(directory)
+        if root is not None and path.is_relative_to(root):
+            return _SCHEMA_RESOURCES[key]
+    return _SCHEMA_RESOURCES.get(path.name)
+
+
+def _directory_or_none(directory: Callable[[], Path]) -> Path | None:
+    try:
+        return directory()
+    except (NotADirectoryError, ValueError):
+        return None
 
 
 @cache

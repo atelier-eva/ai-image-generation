@@ -1,17 +1,17 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://local.spec/prompt.schema.json",
-  "title": "Prompt (prompt/*.json)",
-  "description": "One prompt per JSON file under prompt/. The file stem is the spec id and filename_prefix suffix. Specified-prompt image generation; not cartesian LoRA training rows.",
+  "title": "Prompt (prompt/**/*.json)",
+  "description": "One prompt per JSON file under prompt/, including subfolders. The path relative to prompt/ without .json is the spec id. ComfyUI filename_prefix is {COMFY_UI_FILENAME_PREFIX}/{id}. Specified-prompt image generation; not cartesian LoRA training rows.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["lora", "image_size", "positive", "negative"],
+  "required": ["image_size", "positive", "negative"],
   "properties": {
     "lora": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id"],
-      "description": "LoRA applied via ComfyUI LoraLoader. One per prompt.",
+      "description": "Optional LoRA applied via ComfyUI LoraLoader. One per prompt. Omit lora entirely when unused.",
       "properties": {
         "id": {
           "type": "string",

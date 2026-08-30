@@ -43,7 +43,7 @@
       "url": "./src/ai_media_generation/resources/lora-training/pose.schema.json"
     },
     {
-      "fileMatch": ["**/prompt/*.json"],
+      "fileMatch": ["**/prompt/*.json", "**/prompt/**/*.json"],
       "url": "./src/ai_media_generation/resources/prompt.schema.json"
     },
     {
