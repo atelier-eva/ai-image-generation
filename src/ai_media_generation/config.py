@@ -3,7 +3,6 @@ from pathlib import Path
 
 
 class Config:
-    DEFAULT_INPUT_DIRECTORY = "ai-media-generation"
     DEFAULT_OUTPUT_DIRECTORY = "output"
     LORA_TRAINING_DIRECTORY = "lora-training"
     LORA_TRAINING_GENERATIONS_JSONL = "lora-training-generations.jsonl"
@@ -20,29 +19,24 @@ class Config:
         self.ace_step_filename_prefix = (
             _optional_text("ACE_STEP_FILENAME_PREFIX") or "music"
         )
-        output_directory = _optional_directory("OUTPUT_DIRECTORY")
-        if output_directory is None:
-            output_directory = Path(self.DEFAULT_OUTPUT_DIRECTORY).expanduser().resolve()
-            if output_directory.exists() and not output_directory.is_dir():
-                raise NotADirectoryError(
-                    f"OUTPUT_DIRECTORY is not a directory: {output_directory}"
-                )
-        self.output_directory = output_directory
+        self.output_directory = _directory(
+            "OUTPUT_DIRECTORY", self.DEFAULT_OUTPUT_DIRECTORY
+        )
         self.lora_training_generations_jsonl = (
-            output_directory / self.LORA_TRAINING_GENERATIONS_JSONL
+            self.output_directory / self.LORA_TRAINING_GENERATIONS_JSONL
         )
 
     @property
     def lora_training_directory(self) -> Path:
-        return _input_tree("LORA_TRAINING_DIRECTORY", self.LORA_TRAINING_DIRECTORY)
+        return _directory("LORA_TRAINING_DIRECTORY", self.LORA_TRAINING_DIRECTORY)
 
     @property
     def prompt_directory(self) -> Path:
-        return _input_tree("PROMPT_DIRECTORY", self.PROMPT_DIRECTORY)
+        return _directory("PROMPT_DIRECTORY", self.PROMPT_DIRECTORY)
 
     @property
     def music_directory(self) -> Path:
-        return _input_tree("MUSIC_DIRECTORY", self.MUSIC_DIRECTORY)
+        return _directory("MUSIC_DIRECTORY", self.MUSIC_DIRECTORY)
 
     @property
     def art_style_json(self) -> Path:
@@ -73,19 +67,13 @@ class Config:
         return self.lora_training_directory / "scene.json"
 
 
-def _input_tree(env_name: str, relative: str) -> Path:
-    specified = _optional_directory(env_name)
+def _directory(name: str, default: str) -> Path:
+    specified = _optional_directory(name)
     if specified is not None:
         return specified
-    root_text = (getenv("INPUT_DIRECTORY") or "").strip()
-    if not root_text:
-        raise ValueError(f"{env_name} or INPUT_DIRECTORY is not set.")
-    root = Path(root_text).expanduser().resolve()
-    if root.exists() and not root.is_dir():
-        raise NotADirectoryError(f"INPUT_DIRECTORY is not a directory: {root}")
-    path = root / relative
+    path = Path(default).expanduser().resolve()
     if path.exists() and not path.is_dir():
-        raise NotADirectoryError(f"{env_name} is not a directory: {path}")
+        raise NotADirectoryError(f"{name} is not a directory: {path}")
     return path
 
 
