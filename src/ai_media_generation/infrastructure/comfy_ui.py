@@ -69,7 +69,7 @@ class ComfyUi:
         height: int,
         positive_prompt: str,
         negative_prompt: str,
-        lora_name: str,
+        lora_name: str | None,
         strength_model: float,
         strength_clip: float,
         pose_id: str | None,
@@ -251,7 +251,7 @@ class ComfyUi:
         height: int,
         positive_prompt: str,
         negative_prompt: str,
-        lora_name: str,
+        lora_name: str | None,
         strength_model: float,
         strength_clip: float,
         pose_id: str | None,
@@ -266,10 +266,16 @@ class ComfyUi:
         workflow["8"]["inputs"]["height"] = height
         workflow["8"]["inputs"]["batch_size"] = batch_size
         workflow["11"]["inputs"]["filename_prefix"] = filename_prefix
-        workflow["16"]["inputs"]["lora_name"] = lora_name
-        workflow["16"]["inputs"]["strength_model"] = strength_model
-        workflow["16"]["inputs"]["strength_clip"] = strength_clip
         workflow["7"]["inputs"]["seed"] = seed
+        if lora_name is None:
+            del workflow["16"]
+            workflow["3"]["inputs"]["clip"] = ["2", 1]
+            workflow["4"]["inputs"]["clip"] = ["2", 1]
+            workflow["7"]["inputs"]["model"] = ["2", 0]
+        else:
+            workflow["16"]["inputs"]["lora_name"] = lora_name
+            workflow["16"]["inputs"]["strength_model"] = strength_model
+            workflow["16"]["inputs"]["strength_clip"] = strength_clip
         if pose_id is None:
             del workflow["5"]
             del workflow["6"]

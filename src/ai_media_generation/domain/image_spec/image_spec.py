@@ -6,7 +6,7 @@ from ai_media_generation.domain.image_spec.prompt import Prompt
 @dataclass
 class ImageSpec:
     id: str
-    lora_id: str
+    lora_id: str | None
     width: int
     height: int
     prompt: Prompt

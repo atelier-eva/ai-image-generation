@@ -5,13 +5,13 @@
   "description": "One prompt per JSON file under prompt/. The file stem is the spec id and filename_prefix suffix. Specified-prompt image generation; not cartesian LoRA training rows.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["lora", "image_size", "positive", "negative"],
+  "required": ["image_size", "positive", "negative"],
   "properties": {
     "lora": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id"],
-      "description": "LoRA applied via ComfyUI LoraLoader. One per prompt.",
+      "description": "Optional LoRA applied via ComfyUI LoraLoader. One per prompt. Omit lora entirely when unused.",
       "properties": {
         "id": {
           "type": "string",

@@ -10,7 +10,7 @@ class ImageSpecDto:
     height: int
     positive_prompt: str
     negative_prompt: str
-    lora_id: str
+    lora_id: str | None
     model_strength: float
     text_encoder_strength: float
     pose_id: str | None

@@ -47,11 +47,11 @@ class ImageSpecRepository:
             raise ValueError(f"Invalid prompt id: {identifier}")
 
     def _to_image_spec(self, data: dict[str, Any], identifier: str) -> ImageSpec:
-        lora = data["lora"]
+        lora = data.get("lora") or {}
         size = data["image_size"]
         return ImageSpec(
             id=identifier,
-            lora_id=lora["id"].strip(),
+            lora_id=self._to_lora_id(data),
             width=size["width"],
             height=size["height"],
             prompt=Prompt(
@@ -62,6 +62,15 @@ class ImageSpecRepository:
             text_encoder_strength=self._to_strength(lora.get("strength_clip")),
             pose_id=self._to_pose_id(data),
         )
+
+    def _to_lora_id(self, data: dict[str, Any]) -> str | None:
+        lora = data.get("lora")
+        if not lora:
+            return None
+        identifier = str(lora["id"]).strip()
+        if not identifier:
+            raise ValueError("lora.id is empty or missing.")
+        return identifier
 
     def _to_pose_id(self, data: dict[str, Any]) -> str | None:
         pose = data.get("pose")
