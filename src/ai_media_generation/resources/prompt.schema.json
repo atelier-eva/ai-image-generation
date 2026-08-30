@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://local.spec/prompt.schema.json",
   "title": "Prompt (prompt/**/*.json)",
-  "description": "One prompt per JSON file under prompt/, including subfolders. The path relative to prompt/ without .json is the spec id. ComfyUI filename_prefix is {COMFY_UI_FILENAME_PREFIX}_{id} (id path separators become underscores). Specified-prompt image generation; not cartesian LoRA training rows.",
+  "description": "One prompt per JSON file under prompt/, including subfolders. The path relative to prompt/ without .json is the spec id. ComfyUI filename_prefix is that id (nested folders preserved). Specified-prompt image generation; not cartesian LoRA training rows.",
   "type": "object",
   "additionalProperties": false,
   "required": ["image_size", "positive", "negative"],
