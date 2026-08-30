@@ -3,6 +3,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from ai_media_generation.config import Config
@@ -25,7 +26,6 @@ class AceStep:
             raise ValueError("ACE_STEP_URL is not set.")
         self._url = url
         self._api_key = config.ace_step_api_key
-        self._output_directory = config.output_directory
 
     def generate(
         self,
@@ -98,12 +98,14 @@ class AceStep:
         except urllib.error.URLError as error:
             raise InfrastructureError(f"ACE-Step is not reachable at {self._url}") from error
 
-    def write_audio(self, audios: tuple["AceStep.SavedAudio", ...]) -> int:
+    def write_audio(
+        self, audios: tuple["AceStep.SavedAudio", ...], directory: Path
+    ) -> int:
         if not audios:
             raise InfrastructureError("No saved audio from ACE-Step; cannot write audio.")
         written = 0
         for audio in audios:
-            path = self._output_directory / audio.filename
+            path = directory / audio.filename
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(self.fetch_audio(audio))
             written += 1

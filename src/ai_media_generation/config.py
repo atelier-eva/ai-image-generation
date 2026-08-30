@@ -3,11 +3,13 @@ from pathlib import Path
 
 
 class Config:
-    DEFAULT_OUTPUT_DIRECTORY = "output"
     LORA_TRAINING_DIRECTORY = "lora-training"
     LORA_TRAINING_GENERATIONS_JSONL = "lora-training-generations.jsonl"
     PROMPT_DIRECTORY = "prompt"
     MUSIC_DIRECTORY = "music"
+    IMAGE_OUTPUT_DIRECTORY = "image-output"
+    MUSIC_OUTPUT_DIRECTORY = "music-output"
+    LORA_DATASET_DIRECTORY = "lora-dataset"
 
     def __init__(self) -> None:
         self.comfy_ui_url = _text("COMFY_UI_URL").rstrip("/")
@@ -19,12 +21,22 @@ class Config:
         self.ace_step_filename_prefix = (
             _optional_text("ACE_STEP_FILENAME_PREFIX") or "music"
         )
-        self.output_directory = _directory(
-            "OUTPUT_DIRECTORY", self.DEFAULT_OUTPUT_DIRECTORY
-        )
-        self.lora_training_generations_jsonl = (
-            self.output_directory / self.LORA_TRAINING_GENERATIONS_JSONL
-        )
+
+    @property
+    def image_output_directory(self) -> Path:
+        return _directory("IMAGE_OUTPUT_DIRECTORY", self.IMAGE_OUTPUT_DIRECTORY)
+
+    @property
+    def music_output_directory(self) -> Path:
+        return _directory("MUSIC_OUTPUT_DIRECTORY", self.MUSIC_OUTPUT_DIRECTORY)
+
+    @property
+    def lora_dataset_directory(self) -> Path:
+        return _directory("LORA_DATASET_DIRECTORY", self.LORA_DATASET_DIRECTORY)
+
+    @property
+    def lora_training_generations_jsonl(self) -> Path:
+        return self.lora_dataset_directory / self.LORA_TRAINING_GENERATIONS_JSONL
 
     @property
     def lora_training_directory(self) -> Path:

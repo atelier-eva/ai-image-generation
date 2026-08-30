@@ -31,7 +31,7 @@ class ReportLoraTrainingPatternsController:
         patterns = GenerateShootPatterns().execute()
         if not patterns:
             raise ValueError("No prompt patterns to generate.")
-        directory = Config().output_directory
+        directory = Config().lora_dataset_directory
         directory.mkdir(parents=True, exist_ok=True)
         path = directory / "patterns.csv"
         with path.open("w", encoding="utf-8", newline="") as file:
