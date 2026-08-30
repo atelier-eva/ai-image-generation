@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 from importlib.resources import files
-from os import getenv
 from pathlib import Path
 from sys import argv
 
@@ -21,12 +20,13 @@ class InitController:
     def execute(self, parser: ArgumentParser) -> None:
         parser.add_argument(
             "--directory",
+            default=".",
             help=(
-                "Root directory for feature input folders. "
+                "Parent directory for feature input folders. "
                 f"LoRA templates go in {Config.LORA_TRAINING_DIRECTORY}/. "
                 f"Prompt templates go in {Config.PROMPT_DIRECTORY}/. "
                 f"Music templates go in {Config.MUSIC_DIRECTORY}/. "
-                f"Defaults to INPUT_DIRECTORY or {Config.DEFAULT_INPUT_DIRECTORY}."
+                "Defaults to the current directory."
             ),
         )
         parser.add_argument(
@@ -35,13 +35,9 @@ class InitController:
             help="Overwrite existing JSON files.",
         )
         args = parser.parse_args(argv[2:])
-        text = (
-            args.directory
-            or getenv("INPUT_DIRECTORY")
-            or Config.DEFAULT_INPUT_DIRECTORY
-        ).strip()
+        text = args.directory.strip()
         if not text:
-            raise ValueError("INPUT_DIRECTORY is not set.")
+            raise ValueError("--directory is empty.")
         path = Path(text).expanduser().resolve()
         path.mkdir(parents=True, exist_ok=True)
         lora_training = path / Config.LORA_TRAINING_DIRECTORY
@@ -61,55 +57,22 @@ class InitController:
             music,
             args.force,
         )
-        self._write_env(
-            {
-                "INPUT_DIRECTORY": str(path),
-                "LORA_TRAINING_DIRECTORY": str(lora_training),
-                "PROMPT_DIRECTORY": str(prompt),
-                "MUSIC_DIRECTORY": str(music),
-            }
-        )
-        print(f"Input directory: {path}")
+        self._write_env()
+        print(f"LoRA training directory: {lora_training}")
+        print(f"Prompt directory: {prompt}")
+        print(f"Music directory: {music}")
         print(
             "Fill in the JSON tags, then run: "
             "ai-media-generation lora-training, image, or music"
         )
 
-    def _with_env_values(self, text: str, values: dict[str, str]) -> str:
-        remaining = dict(values)
-        lines: list[str] = []
-        for line in text.splitlines(keepends=True):
-            body = line.rstrip("\r\n")
-            ending = line[len(body) :]
-            stripped = body.strip()
-            matched: str | None = None
-            for key in remaining:
-                if stripped.startswith(f"{key}="):
-                    matched = key
-                    break
-            if matched is None:
-                lines.append(line)
-                continue
-            indent = body[: len(body) - len(body.lstrip())]
-            lines.append(f"{indent}{matched}={remaining.pop(matched)}{ending}")
-        result = "".join(lines)
-        if remaining:
-            if result and not result.endswith("\n"):
-                result += "\n"
-            for key, value in remaining.items():
-                result += f"{key}={value}\n"
-        return result
-
-    def _write_env(self, values: dict[str, str]) -> None:
+    def _write_env(self) -> None:
         env_path = Path(".env")
         if env_path.exists():
             print(f"Skipped existing: {env_path.resolve()}")
             return
         example = files("ai_media_generation.resources").joinpath("env.example")
-        env_path.write_text(
-            self._with_env_values(example.read_text(encoding="utf-8"), values),
-            encoding="utf-8",
-        )
+        env_path.write_text(example.read_text(encoding="utf-8"), encoding="utf-8")
         print(f"Created: {env_path.resolve()}")
 
     def _write_characters(self, destination: Path, force: bool) -> None:
