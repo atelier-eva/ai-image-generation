@@ -9,28 +9,39 @@ from ai_media_generation.repository.json_io import read_json, to_string_tuple
 
 class ImageSpecRepository:
     def get(self, ids: tuple[str, ...] = ()) -> tuple[ImageSpec, ...]:
-        paths = self._paths_for(ids) if ids else self._json_paths()
-        return tuple(self._to_image_spec(read_json(path), path.stem) for path in paths)
-
-    def _paths_for(self, ids: tuple[str, ...]) -> tuple[Path, ...]:
         directory = self._prompt_directory()
+        paths = self._paths_for(directory, ids) if ids else self._json_paths(directory)
+        return tuple(
+            self._to_image_spec(read_json(path), self._id_for(directory, path))
+            for path in paths
+        )
+
+    def _paths_for(self, directory: Path, ids: tuple[str, ...]) -> tuple[Path, ...]:
         paths: list[Path] = []
         for identifier in ids:
-            self._validate_id(identifier)
-            path = directory / f"{identifier}.json"
+            path = self._path_for(directory, identifier)
             if not path.is_file():
-                raise FileNotFoundError(f"Prompt JSON not found: {path.name}")
+                raise FileNotFoundError(f"Prompt JSON not found: {identifier}.json")
             paths.append(path)
         return tuple(paths)
 
-    def _json_paths(self) -> tuple[Path, ...]:
-        directory = self._prompt_directory()
+    def _path_for(self, directory: Path, identifier: str) -> Path:
+        self._validate_id(identifier)
+        path = (directory / f"{identifier}.json").expanduser().resolve()
+        if not path.is_relative_to(directory):
+            raise ValueError(f"Invalid prompt id: {identifier}")
+        return path
+
+    def _json_paths(self, directory: Path) -> tuple[Path, ...]:
         paths = tuple(
-            sorted(path for path in directory.glob("*.json") if path.is_file())
+            sorted(path for path in directory.rglob("*.json") if path.is_file())
         )
         if not paths:
             raise FileNotFoundError(f"No prompt JSON in {directory}")
         return paths
+
+    def _id_for(self, directory: Path, path: Path) -> str:
+        return path.resolve().relative_to(directory).with_suffix("").as_posix()
 
     def _prompt_directory(self) -> Path:
         directory = Config().prompt_directory
@@ -40,10 +51,15 @@ class ImageSpecRepository:
             raise NotADirectoryError(
                 f"Prompt directory is not a directory: {directory}"
             )
-        return directory
+        return directory.resolve()
 
     def _validate_id(self, identifier: str) -> None:
-        if not identifier or Path(identifier).name != identifier:
+        path = Path(identifier)
+        if (
+            not identifier
+            or path.is_absolute()
+            or any(part in ("", ".", "..") for part in path.parts)
+        ):
             raise ValueError(f"Invalid prompt id: {identifier}")
 
     def _to_image_spec(self, data: dict[str, Any], identifier: str) -> ImageSpec:

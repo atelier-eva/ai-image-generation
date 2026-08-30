@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-from pathlib import Path
 from sys import argv
 
 from ai_media_generation.config import Config
@@ -15,8 +14,8 @@ class GenerateImagesController:
             "files",
             nargs="*",
             help=(
-                "Prompt JSON filenames under prompt/. "
-                "Omit to generate every file."
+                "Prompt JSON paths under prompt/, relative, nested allowed "
+                "(e.g. hero/smile.json). Omit to generate every file."
             ),
         )
         args = parser.parse_args(argv[2:])
@@ -27,7 +26,7 @@ class GenerateImagesController:
         prefix = Config().comfy_ui_filename_prefix
         comfy_ui = ComfyUi()
         for index, spec in enumerate(specs):
-            filename_prefix = f"{prefix}_{spec.id}"
+            filename_prefix = f"{prefix}/{spec.id}"
             seed = args.base_seed + index
             print(f"[{index + 1}/{len(specs)}] {filename_prefix} seed={seed}")
             images = comfy_ui.generate_images(
@@ -60,9 +59,10 @@ class GenerateImagesController:
         return tuple(ids)
 
     def _prompt_id(self, value: str) -> str:
-        filename = Path(value).name.strip()
-        if filename.endswith(".json"):
-            filename = filename[: -len(".json")]
-        if not filename:
+        text = value.strip().replace("\\", "/")
+        if text.endswith(".json"):
+            text = text[: -len(".json")]
+        text = text.strip("/")
+        if not text:
             raise ValueError("Prompt id is empty.")
-        return filename
+        return text

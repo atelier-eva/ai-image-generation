@@ -18,6 +18,7 @@ _SCHEMA_RESOURCES = {
     "prompt": ("prompt.schema.json",),
     "scene.json": ("lora-training", "scene.schema.json"),
 }
+_DIRECTORY_SCHEMA_KEYS = ("prompt", "music", "characters")
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -71,7 +72,11 @@ def to_string_tuple(value: Any) -> tuple[str, ...]:
 
 
 def _schema_resource(path: Path) -> tuple[str, ...] | None:
-    return _SCHEMA_RESOURCES.get(path.parent.name) or _SCHEMA_RESOURCES.get(path.name)
+    ancestor_names = {parent.name for parent in path.parents}
+    for key in _DIRECTORY_SCHEMA_KEYS:
+        if key in ancestor_names:
+            return _SCHEMA_RESOURCES[key]
+    return _SCHEMA_RESOURCES.get(path.name)
 
 
 @cache

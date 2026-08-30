@@ -78,7 +78,7 @@ def _parser() -> ArgumentParser:
     )
     subparsers.add_parser(
         "image",
-        help="Generate images from prompt/*.json specs.",
+        help="Generate images from prompt JSON specs (nested folders allowed).",
     )
     subparsers.add_parser(
         "music",
