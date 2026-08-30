@@ -86,7 +86,7 @@ def _parser() -> ArgumentParser:
     )
     subparsers.add_parser(
         "init",
-        help="Create input JSON templates in INPUT_DIRECTORY.",
+        help="Create input JSON templates.",
     )
     subparsers.add_parser(
         "report",

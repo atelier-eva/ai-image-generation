@@ -45,57 +45,69 @@ class InitController:
         path = Path(text).expanduser().resolve()
         path.mkdir(parents=True, exist_ok=True)
         lora_training = path / Config.LORA_TRAINING_DIRECTORY
+        prompt = path / Config.PROMPT_DIRECTORY
+        music = path / Config.MUSIC_DIRECTORY
         lora_training.mkdir(parents=True, exist_ok=True)
         for name in _JSON_FILES:
             self._write_json(lora_training / name, args.force)
         self._write_characters(lora_training / _CHARACTERS_DIRECTORY, args.force)
         self._write_directory(
             (Config.PROMPT_DIRECTORY,),
-            path / Config.PROMPT_DIRECTORY,
+            prompt,
             args.force,
         )
         self._write_directory(
             (Config.MUSIC_DIRECTORY,),
-            path / Config.MUSIC_DIRECTORY,
+            music,
             args.force,
         )
-        self._write_env(text)
+        self._write_env(
+            {
+                "INPUT_DIRECTORY": str(path),
+                "LORA_TRAINING_DIRECTORY": str(lora_training),
+                "PROMPT_DIRECTORY": str(prompt),
+                "MUSIC_DIRECTORY": str(music),
+            }
+        )
         print(f"Input directory: {path}")
         print(
             "Fill in the JSON tags, then run: "
             "ai-media-generation lora-training, image, or music"
         )
 
-    def _with_input_directory(self, text: str, directory: str) -> str:
+    def _with_env_values(self, text: str, values: dict[str, str]) -> str:
+        remaining = dict(values)
         lines: list[str] = []
-        replaced = False
         for line in text.splitlines(keepends=True):
             body = line.rstrip("\r\n")
             ending = line[len(body) :]
-            if body.strip().startswith("INPUT_DIRECTORY="):
-                indent = body[: len(body) - len(body.lstrip())]
-                lines.append(f"{indent}INPUT_DIRECTORY={directory}{ending}")
-                replaced = True
-            else:
+            stripped = body.strip()
+            matched: str | None = None
+            for key in remaining:
+                if stripped.startswith(f"{key}="):
+                    matched = key
+                    break
+            if matched is None:
                 lines.append(line)
+                continue
+            indent = body[: len(body) - len(body.lstrip())]
+            lines.append(f"{indent}{matched}={remaining.pop(matched)}{ending}")
         result = "".join(lines)
-        if replaced:
-            return result
-        if result and not result.endswith("\n"):
-            result += "\n"
-        return result + f"INPUT_DIRECTORY={directory}\n"
+        if remaining:
+            if result and not result.endswith("\n"):
+                result += "\n"
+            for key, value in remaining.items():
+                result += f"{key}={value}\n"
+        return result
 
-    def _write_env(self, directory: str) -> None:
+    def _write_env(self, values: dict[str, str]) -> None:
         env_path = Path(".env")
         if env_path.exists():
             print(f"Skipped existing: {env_path.resolve()}")
             return
         example = files("ai_media_generation.resources").joinpath("env.example")
         env_path.write_text(
-            self._with_input_directory(
-                example.read_text(encoding="utf-8"),
-                directory,
-            ),
+            self._with_env_values(example.read_text(encoding="utf-8"), values),
             encoding="utf-8",
         )
         print(f"Created: {env_path.resolve()}")
