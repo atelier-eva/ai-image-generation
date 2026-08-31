@@ -46,10 +46,10 @@
       "additionalProperties": false,
       "required": ["width", "height"],
       "properties": {
-        "width": { "type": "integer", "minimum": 1 },
-        "height": { "type": "integer", "minimum": 1 }
+        "width": { "$ref": "#/$defs/image_dimension" },
+        "height": { "$ref": "#/$defs/image_dimension" }
       },
-      "description": "Output dimensions (width x height)."
+      "description": "Output dimensions (width x height). Each side must be a multiple of 64 and at most 1536."
     },
     "positive": {
       "$ref": "#/$defs/tags",
@@ -61,6 +61,13 @@
     }
   },
   "$defs": {
+    "image_dimension": {
+      "type": "integer",
+      "minimum": 64,
+      "maximum": 1536,
+      "multipleOf": 64,
+      "description": "Pixel length. Multiple of 64, at most 1536 (Animagine XL 4 recommended range)."
+    },
     "tags": {
       "type": "array",
       "items": { "type": "string", "minLength": 1 }
