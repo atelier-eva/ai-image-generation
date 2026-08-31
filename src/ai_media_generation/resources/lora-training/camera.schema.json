@@ -32,7 +32,7 @@
               "width": { "$ref": "#/$defs/image_dimension" },
               "height": { "$ref": "#/$defs/image_dimension" }
             },
-            "description": "Output dimensions for this camera distance (width x height). Each side must be a multiple of 64."
+            "description": "Output dimensions for this camera distance (width x height). Each side must be a multiple of 64 and at most 1536."
           }
         }
       }
@@ -42,8 +42,9 @@
     "image_dimension": {
       "type": "integer",
       "minimum": 64,
+      "maximum": 1536,
       "multipleOf": 64,
-      "description": "Pixel length. Multiple of 64 (Animagine XL 4 / SDXL; valid for ComfyUI EmptyLatentImage)."
+      "description": "Pixel length. Multiple of 64, at most 1536 (Animagine XL 4 recommended range)."
     },
     "tags": {
       "type": "array",
