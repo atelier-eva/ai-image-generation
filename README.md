@@ -14,4 +14,5 @@ ai-media-generation lora-training
 ai-media-generation image
 ai-media-generation music
 ai-media-generation report
+ai-media-generation see-through path/to/image.png
 ```
