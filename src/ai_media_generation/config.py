@@ -10,7 +10,6 @@ class Config:
     IMAGE_OUTPUT_DIRECTORY = "image-output"
     MUSIC_OUTPUT_DIRECTORY = "music-output"
     LORA_DATASET_DIRECTORY = "lora-dataset"
-    SEE_THROUGH_SAVE_DIRECTORY = "see-through-output"
 
     def __init__(self) -> None:
         self.comfy_ui_url = _text("COMFY_UI_URL").rstrip("/")
@@ -22,12 +21,6 @@ class Config:
         self.ace_step_filename_prefix = (
             _optional_text("ACE_STEP_FILENAME_PREFIX") or "music"
         )
-        self.see_through_root = _optional_text("SEE_THROUGH_ROOT")
-        self.see_through_python = _optional_text("SEE_THROUGH_PYTHON")
-        timeout = _optional_int("SEE_THROUGH_TIMEOUT_SECONDS")
-        if timeout is not None and timeout <= 0:
-            raise ValueError("SEE_THROUGH_TIMEOUT_SECONDS must be positive.")
-        self.see_through_timeout_seconds = 1800 if timeout is None else timeout
 
     @property
     def image_output_directory(self) -> Path:
@@ -85,10 +78,6 @@ class Config:
     def scene_json(self) -> Path:
         return self.lora_training_directory / "scene.json"
 
-    @property
-    def see_through_save_directory(self) -> Path:
-        return _directory("SEE_THROUGH_SAVE_DIRECTORY", self.SEE_THROUGH_SAVE_DIRECTORY)
-
 
 def _directory(name: str, default: str) -> Path:
     specified = _optional_directory(name)
@@ -108,16 +97,6 @@ def _optional_directory(name: str) -> Path | None:
     if path.exists() and not path.is_dir():
         raise NotADirectoryError(f"{name} is not a directory: {path}")
     return path
-
-
-def _optional_int(name: str) -> int | None:
-    text = _optional_text(name)
-    if text is None:
-        return None
-    try:
-        return int(text)
-    except ValueError as error:
-        raise ValueError(f"{name} is not an integer: {text}") from error
 
 
 def _optional_text(name: str) -> str | None:
