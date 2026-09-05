@@ -63,7 +63,7 @@ class InitController:
         print(f"Music directory: {music}")
         print(
             "Fill in the JSON tags, then run: "
-            "ai-media-generation lora-training, image, music, or see-through"
+            "ai-media-generation lora-training, image, music, or report"
         )
 
     def _write_env(self) -> None:

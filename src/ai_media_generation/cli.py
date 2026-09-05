@@ -20,7 +20,6 @@ from ai_media_generation.controller.init_controller import InitController
 from ai_media_generation.controller.report_lora_training_patterns_controller import (
     ReportLoraTrainingPatternsController,
 )
-from ai_media_generation.controller.see_through_controller import SeeThroughController
 from ai_media_generation.infrastructure.error import InfrastructureError
 
 _USER_ERRORS = (
@@ -59,8 +58,13 @@ def _run() -> None:
         ReportLoraTrainingPatternsController().execute(_command_parser("report"))
         return
     if command == "see-through":
-        SeeThroughController().execute(_command_parser("see-through"))
-        return
+        print(
+            "ai-media-generation: see-through was removed.\n"
+            "Use the official See-through CLI instead:\n"
+            "  python inference/scripts/inference_psd.py --srcp IMAGE --save_to_psd",
+            file=stderr,
+        )
+        raise SystemExit(1)
     _parser().parse_args(arguments)
 
 
@@ -95,9 +99,5 @@ def _parser() -> ArgumentParser:
     subparsers.add_parser(
         "report",
         help="Write LoRA training pattern rows to CSV.",
-    )
-    subparsers.add_parser(
-        "see-through",
-        help="Decompose images into See-through character layers.",
     )
     return parser
